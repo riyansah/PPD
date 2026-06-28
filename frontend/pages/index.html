@@ -12,16 +12,12 @@
         <div class="brand">
           <p class="eyebrow">PPD</p>
           <h1>Productivity Dashboard</h1>
-          <p class="subtle">Single-user command center for work, activities, and routines.</p>
+          <p class="subtle" data-user-summary>Loading account…</p>
         </div>
         <nav class="nav-list">
-          <a href="#" class="nav-link is-active">Dashboard</a>
-          <a href="#" class="nav-link">Pekerjaan</a>
-          <a href="#" class="nav-link">Aktivitas</a>
-          <a href="#" class="nav-link">Rutinitas</a>
-          <a href="#" class="nav-link">Laporan</a>
-          <a href="#" class="nav-link">Pengaturan</a>
-          <a href="#" class="nav-link">Logout</a>
+          <a href="/" class="nav-link is-active">Dashboard</a>
+          <a href="#security" class="nav-link">Security</a>
+          <button type="button" class="nav-link nav-button" data-logout-button>Logout</button>
         </nav>
       </aside>
 
@@ -31,47 +27,52 @@
             Menu
           </button>
           <div>
-            <p class="eyebrow">Phase 1 Foundation</p>
-            <h2>Application Shell</h2>
+            <p class="eyebrow">Phase 2 Authentication</p>
+            <h2>Session and Password Settings</h2>
           </div>
           <div class="server-time" data-server-time>Loading server time…</div>
         </header>
 
         <nav class="mobile-menu" id="mobile-menu" hidden aria-label="Mobile">
-          <a href="#" class="nav-link is-active">Dashboard</a>
-          <a href="#" class="nav-link">Pekerjaan</a>
-          <a href="#" class="nav-link">Aktivitas</a>
-          <a href="#" class="nav-link">Rutinitas</a>
-          <a href="#" class="nav-link">Laporan</a>
-          <a href="#" class="nav-link">Pengaturan</a>
+          <a href="/" class="nav-link is-active">Dashboard</a>
+          <a href="#security" class="nav-link">Security</a>
+          <button type="button" class="nav-link nav-button" data-logout-button>Logout</button>
         </nav>
 
         <section class="hero-card">
           <div>
-            <p class="eyebrow">Today in WIB</p>
-            <h3>Foundation ready for dashboard modules</h3>
-            <p class="subtle">
-              Backend, SQLite schema, logging, migrations, and the responsive shell are in place.
-            </p>
+            <p class="eyebrow">Authenticated Session</p>
+            <h3 data-display-name>Loading…</h3>
+            <p class="subtle" data-session-summary>Fetching session details…</p>
           </div>
           <div class="hero-pill">Asia/Jakarta</div>
         </section>
 
-        <section class="grid">
+        <section class="grid grid-two">
           <article class="panel">
-            <p class="panel-label">Backend</p>
-            <h3>Express + SQLite</h3>
-            <p>Environment-aware server startup, database migrations, structured logs, and centralized error responses.</p>
+            <p class="panel-label">Account</p>
+            <h3>Signed-in identity</h3>
+            <p data-account-details>Loading account profile…</p>
           </article>
-          <article class="panel">
-            <p class="panel-label">Time Source</p>
-            <h3>Server-Synced WIB</h3>
-            <p>Utilities format server time into Asia/Jakarta so countdowns and daily views can stay consistent.</p>
-          </article>
-          <article class="panel">
-            <p class="panel-label">Frontend</p>
-            <h3>Responsive Shell</h3>
-            <p>Desktop sidebar, mobile navigation, and placeholder panels ready for authenticated modules in Phase 2.</p>
+          <article class="panel" id="security">
+            <p class="panel-label">Security</p>
+            <h3>Change password</h3>
+            <form class="auth-form compact-form" data-password-form novalidate>
+              <label class="field">
+                <span>Current password</span>
+                <input name="current_password" type="password" autocomplete="current-password" required>
+              </label>
+              <label class="field">
+                <span>New password</span>
+                <input name="new_password" type="password" autocomplete="new-password" required>
+              </label>
+              <label class="field">
+                <span>Confirm new password</span>
+                <input name="confirm_password" type="password" autocomplete="new-password" required>
+              </label>
+              <p class="form-message" data-password-message aria-live="polite"></p>
+              <button class="primary-button" type="submit" data-password-submit>Update password</button>
+            </form>
           </article>
         </section>
       </main>

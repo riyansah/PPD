@@ -1,8 +1,8 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const test = require("node:test");
-const assert = require("node:assert/strict");
 
 const { createDatabaseConnection } = require("../backend/src/db/client");
 const { runMigrations } = require("../backend/src/db/migrate");
@@ -24,12 +24,14 @@ test("runMigrations creates the initial schema from an empty database", () => {
     .map((row) => row.name);
 
   assert.ok(tables.includes("users"));
+  assert.ok(tables.includes("sessions"));
   assert.ok(tables.includes("tasks"));
   assert.ok(tables.includes("activities"));
   assert.ok(tables.includes("routines"));
   assert.ok(tables.includes("routine_histories"));
   assert.ok(tables.includes("notifications"));
   assert.ok(tables.includes("settings"));
+  assert.ok(tables.includes("login_rate_limits"));
   assert.ok(tables.includes("schema_migrations"));
 
   db.close();

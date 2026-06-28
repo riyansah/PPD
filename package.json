@@ -1,6 +1,6 @@
 {
   "name": "personal-productivity-dashboard",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Personal Productivity Dashboard foundation",
   "main": "backend/src/server.js",
@@ -8,6 +8,7 @@
     "dev": "node --watch backend/src/server.js",
     "start": "node backend/src/server.js",
     "migrate": "node backend/src/db/migrate.js",
+    "setup:account": "node backend/src/cli/setup-account.js",
     "test": "node --test",
     "lint": "node scripts/check-syntax.js"
   },

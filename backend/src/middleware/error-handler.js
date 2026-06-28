@@ -9,7 +9,16 @@ function errorHandlerMiddleware({ logger }) {
 
     const statusCode = error.statusCode || 500;
     const code = error.code || "INTERNAL_ERROR";
-    const message = statusCode >= 500 ? "An unexpected error occurred." : error.message;
+    const isServerError = statusCode >= 500;
+    const errors = Array.isArray(error.details) && error.details.length > 0
+      ? error.details
+      : [
+          {
+            code,
+            message: isServerError ? "An unexpected error occurred." : error.message,
+            ...(error.field ? { field: error.field } : {})
+          }
+        ];
 
     logger.error("request_failed", {
       request_id: req.requestId,
@@ -24,13 +33,15 @@ function errorHandlerMiddleware({ logger }) {
     res.status(statusCode).json(
       createErrorResponse({
         requestId: req.requestId,
-        errors: [
-          {
-            code,
-            message,
-            ...(error.field ? { field: error.field } : {})
-          }
-        ]
+        meta: error.meta || {},
+        errors: isServerError
+          ? [
+              {
+                code,
+                message: "An unexpected error occurred."
+              }
+            ]
+          : errors
       })
     );
   };

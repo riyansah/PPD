@@ -4,7 +4,7 @@
 
 - [x] Validasi keputusan ambigu fase 0.
 - [x] Siapkan fondasi proyek.
-- [ ] Implementasi autentikasi.
+- [x] Implementasi autentikasi.
 - [ ] Implementasi modul pekerjaan.
 - [ ] Implementasi modul aktivitas.
 - [ ] Implementasi modul rutinitas dan riwayat.
@@ -51,23 +51,23 @@ Acceptance:
 
 ## Fase 2. Autentikasi dan Sesi
 
-- [ ] Implementasi setup akun awal.
-- [ ] Implementasi `POST /api/auth/login`.
-- [ ] Implementasi `POST /api/auth/logout`.
-- [ ] Implementasi `GET /api/auth/session`.
-- [ ] Implementasi `PUT /api/auth/password`.
-- [ ] Tambahkan hashing password aman.
-- [ ] Tambahkan session cookie aman.
-- [ ] Tambahkan middleware proteksi endpoint.
-- [ ] Tambahkan rate limiting login.
-- [ ] Tambahkan halaman login dan redirect auth flow.
+- [x] Implementasi setup akun awal.
+- [x] Implementasi `POST /api/auth/login`.
+- [x] Implementasi `POST /api/auth/logout`.
+- [x] Implementasi `GET /api/auth/session`.
+- [x] Implementasi `PUT /api/auth/password`.
+- [x] Tambahkan hashing password aman.
+- [x] Tambahkan session cookie aman.
+- [x] Tambahkan middleware proteksi endpoint.
+- [x] Tambahkan rate limiting login.
+- [x] Tambahkan halaman login dan redirect auth flow.
 
 Acceptance:
 
-- [ ] Login/logout berfungsi.
-- [ ] Endpoint privat terproteksi.
-- [ ] Password tidak pernah tersimpan plaintext.
-- [ ] Session timeout dan rate limit aktif.
+- [x] Login/logout berfungsi.
+- [x] Endpoint privat terproteksi.
+- [x] Password tidak pernah tersimpan plaintext.
+- [x] Session timeout dan rate limit aktif.
 
 ## Fase 3. Modul Pekerjaan
 

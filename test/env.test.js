@@ -8,16 +8,27 @@ test("parseEnvFile parses comments and quoted values", () => {
 # comment
 PORT=4000
 APP_NAME="PPD"
+SESSION_COOKIE_NAME=ppd_sid
 `);
 
   assert.equal(values.PORT, "4000");
   assert.equal(values.APP_NAME, "PPD");
+  assert.equal(values.SESSION_COOKIE_NAME, "ppd_sid");
 });
 
-test("createEnv enforces Asia/Jakarta timezone", () => {
-  const env = createEnv({ port: "3001", timezone: "Asia/Jakarta" });
+test("createEnv enforces Asia/Jakarta timezone and session settings", () => {
+  const env = createEnv({
+    port: "3001",
+    timezone: "Asia/Jakarta",
+    sessionAbsoluteTtlSeconds: "60",
+    sessionIdleTtlSeconds: "30",
+    loginRateLimitMaxAttempts: "5",
+    loginRateLimitWindowMinutes: "15"
+  });
   assert.equal(env.port, 3001);
   assert.equal(env.timezone, "Asia/Jakarta");
+  assert.equal(env.sessionAbsoluteTtlSeconds, 60);
+  assert.equal(env.sessionIdleTtlSeconds, 30);
   assert.equal(env.isProduction, false);
 });
 

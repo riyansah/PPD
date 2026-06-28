@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | Personal Productivity Dashboard</title>
+    <link rel="stylesheet" href="/styles/app.css">
+  </head>
+  <body class="login-body">
+    <main class="login-layout">
+      <section class="login-intro">
+        <p class="eyebrow">Secure Access</p>
+        <h1>Personal Productivity Dashboard</h1>
+        <p class="subtle">
+          Single-user access only. Initial account creation is performed with the local setup command.
+        </p>
+      </section>
+
+      <section class="login-panel">
+        <form class="auth-form" data-login-form novalidate>
+          <h2>Login</h2>
+          <label class="field">
+            <span>Username or email</span>
+            <input name="login" type="text" autocomplete="username" required>
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input name="password" type="password" autocomplete="current-password" required>
+          </label>
+          <p class="form-message" data-form-message aria-live="polite"></p>
+          <button class="primary-button" type="submit" data-submit-button>Login</button>
+        </form>
+      </section>
+    </main>
+    <script src="/scripts/login.js" defer></script>
+  </body>
+</html>

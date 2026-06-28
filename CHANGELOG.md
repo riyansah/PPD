@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-28
+
+### Added
+- Added single-user account setup, login, logout, password change, and persistent server-side session management.
+- Added authentication-protected application pages, rate-limited login handling, and responsive login/security flows for desktop and mobile.
+- Added automated authentication tests covering setup, session lifecycle, password changes, cookie policy, and rate limiting.
+
 ## [0.2.0] - 2026-06-28
 
 ### Added
