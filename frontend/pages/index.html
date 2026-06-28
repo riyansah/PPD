@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Personal Productivity Dashboard</title>
+    <link rel="stylesheet" href="/styles/app.css">
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar" aria-label="Primary">
+        <div class="brand">
+          <p class="eyebrow">PPD</p>
+          <h1>Productivity Dashboard</h1>
+          <p class="subtle">Single-user command center for work, activities, and routines.</p>
+        </div>
+        <nav class="nav-list">
+          <a href="#" class="nav-link is-active">Dashboard</a>
+          <a href="#" class="nav-link">Pekerjaan</a>
+          <a href="#" class="nav-link">Aktivitas</a>
+          <a href="#" class="nav-link">Rutinitas</a>
+          <a href="#" class="nav-link">Laporan</a>
+          <a href="#" class="nav-link">Pengaturan</a>
+          <a href="#" class="nav-link">Logout</a>
+        </nav>
+      </aside>
+
+      <main class="content">
+        <header class="topbar">
+          <button class="menu-button" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu">
+            Menu
+          </button>
+          <div>
+            <p class="eyebrow">Phase 1 Foundation</p>
+            <h2>Application Shell</h2>
+          </div>
+          <div class="server-time" data-server-time>Loading server time…</div>
+        </header>
+
+        <nav class="mobile-menu" id="mobile-menu" hidden aria-label="Mobile">
+          <a href="#" class="nav-link is-active">Dashboard</a>
+          <a href="#" class="nav-link">Pekerjaan</a>
+          <a href="#" class="nav-link">Aktivitas</a>
+          <a href="#" class="nav-link">Rutinitas</a>
+          <a href="#" class="nav-link">Laporan</a>
+          <a href="#" class="nav-link">Pengaturan</a>
+        </nav>
+
+        <section class="hero-card">
+          <div>
+            <p class="eyebrow">Today in WIB</p>
+            <h3>Foundation ready for dashboard modules</h3>
+            <p class="subtle">
+              Backend, SQLite schema, logging, migrations, and the responsive shell are in place.
+            </p>
+          </div>
+          <div class="hero-pill">Asia/Jakarta</div>
+        </section>
+
+        <section class="grid">
+          <article class="panel">
+            <p class="panel-label">Backend</p>
+            <h3>Express + SQLite</h3>
+            <p>Environment-aware server startup, database migrations, structured logs, and centralized error responses.</p>
+          </article>
+          <article class="panel">
+            <p class="panel-label">Time Source</p>
+            <h3>Server-Synced WIB</h3>
+            <p>Utilities format server time into Asia/Jakarta so countdowns and daily views can stay consistent.</p>
+          </article>
+          <article class="panel">
+            <p class="panel-label">Frontend</p>
+            <h3>Responsive Shell</h3>
+            <p>Desktop sidebar, mobile navigation, and placeholder panels ready for authenticated modules in Phase 2.</p>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="/scripts/app.js" defer></script>
+  </body>
+</html>

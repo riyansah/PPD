@@ -2,8 +2,8 @@
 
 ## Status Awal
 
-- [ ] Validasi keputusan ambigu fase 0.
-- [ ] Siapkan fondasi proyek.
+- [x] Validasi keputusan ambigu fase 0.
+- [x] Siapkan fondasi proyek.
 - [ ] Implementasi autentikasi.
 - [ ] Implementasi modul pekerjaan.
 - [ ] Implementasi modul aktivitas.
@@ -15,39 +15,39 @@
 
 ## Fase 0. Klarifikasi dan Desain Teknis
 
-- [ ] Tetapkan timeout sesi.
-- [ ] Tetapkan rate limiting login.
-- [ ] Tetapkan formula final persentase pekerjaan.
-- [ ] Tetapkan format backup dan restore.
-- [ ] Tetapkan format ekspor CSV multi-data.
-- [ ] Tetapkan strategi scheduler untuk notifikasi dan rutinitas terlewat.
-- [ ] Tetapkan kebijakan soft delete vs hard delete operasional.
-- [ ] Tetapkan kontrak respons API dan format error.
-- [ ] Tetapkan default pagination dan perilaku pencarian.
-- [ ] Tetapkan keputusan apakah browser notification masuk MVP atau pasca-MVP awal.
+- [x] Tetapkan timeout sesi.
+- [x] Tetapkan rate limiting login.
+- [x] Tetapkan formula final persentase pekerjaan.
+- [x] Tetapkan format backup dan restore.
+- [x] Tetapkan format ekspor CSV multi-data.
+- [x] Tetapkan strategi scheduler untuk notifikasi dan rutinitas terlewat.
+- [x] Tetapkan kebijakan soft delete vs hard delete operasional.
+- [x] Tetapkan kontrak respons API dan format error.
+- [x] Tetapkan default pagination dan perilaku pencarian.
+- [x] Tetapkan keputusan apakah browser notification masuk MVP atau pasca-MVP awal.
 
 Acceptance:
 
-- [ ] Semua keputusan ambigu utama terdokumentasi.
-- [ ] Skema data awal dan kontrak API dasar siap diimplementasikan.
+- [x] Semua keputusan ambigu utama terdokumentasi.
+- [x] Skema data awal dan kontrak API dasar siap diimplementasikan.
 
 ## Fase 1. Fondasi Proyek
 
-- [ ] Inisialisasi struktur folder frontend dan backend.
-- [ ] Tambahkan konfigurasi environment dasar.
-- [ ] Setup server Node.js dan Express.js.
-- [ ] Setup SQLite dan mekanisme migrasi.
-- [ ] Buat skema dasar tabel sesuai PRD.
-- [ ] Tambahkan middleware error handling dasar.
-- [ ] Tambahkan logging error dasar.
-- [ ] Bangun layout dasar: shell aplikasi, sidebar desktop, navigasi mobile.
-- [ ] Siapkan utilitas waktu `Asia/Jakarta` dan sinkronisasi waktu server.
+- [x] Inisialisasi struktur folder frontend dan backend.
+- [x] Tambahkan konfigurasi environment dasar.
+- [x] Setup server Node.js dan Express.js.
+- [x] Setup SQLite dan mekanisme migrasi.
+- [x] Buat skema dasar tabel sesuai PRD.
+- [x] Tambahkan middleware error handling dasar.
+- [x] Tambahkan logging error dasar.
+- [x] Bangun layout dasar: shell aplikasi, sidebar desktop, navigasi mobile.
+- [x] Siapkan utilitas waktu `Asia/Jakarta` dan sinkronisasi waktu server.
 
 Acceptance:
 
-- [ ] Server dapat berjalan lokal dan terkoneksi ke database.
-- [ ] Migrasi awal berhasil.
-- [ ] Layout dasar responsif tersedia.
+- [x] Server dapat berjalan lokal dan terkoneksi ke database.
+- [x] Migrasi awal berhasil.
+- [x] Layout dasar responsif tersedia.
 
 ## Fase 2. Autentikasi dan Sesi
 
