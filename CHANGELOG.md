@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-28
+
+### Added
+- Added authenticated task management endpoints with CRUD, status updates, soft delete, search, filters, sorting, pagination, and overdue computation.
+- Added responsive Pekerjaan views for task listing, task detail, creation, editing, deletion, status changes, and password management within the authenticated shell.
+- Added automated task-management tests covering authentication, validation, ownership isolation, overdue logic, completed timestamps, filtering, sorting, pagination, and soft delete behavior.
+
 ## [0.3.0] - 2026-06-28
 
 ### Added

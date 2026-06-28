@@ -5,7 +5,7 @@
 - [x] Validasi keputusan ambigu fase 0.
 - [x] Siapkan fondasi proyek.
 - [x] Implementasi autentikasi.
-- [ ] Implementasi modul pekerjaan.
+- [x] Implementasi modul pekerjaan.
 - [ ] Implementasi modul aktivitas.
 - [ ] Implementasi modul rutinitas dan riwayat.
 - [ ] Implementasi dashboard dan grafik.
@@ -71,21 +71,21 @@ Acceptance:
 
 ## Fase 3. Modul Pekerjaan
 
-- [ ] Buat tabel/query CRUD pekerjaan.
-- [ ] Implementasi endpoint daftar, detail, create, update, delete.
-- [ ] Implementasi endpoint ubah status.
-- [ ] Tambahkan validasi field dan aturan deadline.
-- [ ] Tambahkan search, filter, sort, pagination.
-- [ ] Tambahkan kalkulasi kondisi terlambat.
-- [ ] Simpan `completed_at` saat status selesai.
-- [ ] Bangun UI daftar pekerjaan.
-- [ ] Bangun UI form dan detail pekerjaan.
+- [x] Buat tabel/query CRUD pekerjaan.
+- [x] Implementasi endpoint daftar, detail, create, update, delete.
+- [x] Implementasi endpoint ubah status.
+- [x] Tambahkan validasi field dan aturan deadline.
+- [x] Tambahkan search, filter, sort, pagination.
+- [x] Tambahkan kalkulasi kondisi terlambat.
+- [x] Simpan `completed_at` saat status selesai.
+- [x] Bangun UI daftar pekerjaan.
+- [x] Bangun UI form dan detail pekerjaan.
 
 Acceptance:
 
-- [ ] Seluruh CRUD pekerjaan berjalan.
-- [ ] Filter, sort, search, pagination berjalan.
-- [ ] Kondisi terlambat dan `completed_at` akurat.
+- [x] Seluruh CRUD pekerjaan berjalan.
+- [x] Filter, sort, search, pagination berjalan.
+- [x] Kondisi terlambat dan `completed_at` akurat.
 
 ## Fase 4. Modul Aktivitas
 

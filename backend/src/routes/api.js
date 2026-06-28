@@ -1,11 +1,13 @@
 const express = require("express");
 const { createSuccessResponse } = require("../http/response");
 const { createAuthRouter } = require("./auth");
+const { createTaskRouter } = require("./tasks");
 
-function createApiRouter({ env, db, authService }) {
+function createApiRouter({ env, db, authService, taskService }) {
   const router = express.Router();
 
   router.use("/auth", createAuthRouter({ env, authService }));
+  router.use("/tasks", createTaskRouter({ taskService }));
 
   router.get("/health", (req, res) => {
     const tableCount = db

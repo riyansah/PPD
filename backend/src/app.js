@@ -13,21 +13,26 @@ const {
 const { createUserRepository } = require("./repositories/user-repository");
 const { createSessionRepository } = require("./repositories/session-repository");
 const { createLoginRateLimitRepository } = require("./repositories/login-rate-limit-repository");
+const { createTaskRepository } = require("./repositories/task-repository");
 const { createAuthService } = require("./services/auth-service");
+const { createTaskService } = require("./services/task-service");
 
 function createApp({ env, db, logger }) {
   const app = express();
   const frontendRoot = path.resolve(__dirname, "..", "..", "frontend");
   const userRepository = createUserRepository(db);
   const sessionRepository = createSessionRepository(db);
+  const loginRateLimitRepository = createLoginRateLimitRepository(db);
+  const taskRepository = createTaskRepository(db);
   const authService = createAuthService({
     env,
     db,
     logger,
     userRepository,
     sessionRepository,
-    loginRateLimitRepository: createLoginRateLimitRepository(db)
+    loginRateLimitRepository
   });
+  const taskService = createTaskService({ taskRepository });
 
   app.disable("x-powered-by");
   app.use(requestContextMiddleware);
@@ -39,17 +44,13 @@ function createApp({ env, db, logger }) {
   app.use("/assets", express.static(path.join(frontendRoot, "assets")));
   app.use("/styles", express.static(path.join(frontendRoot, "styles")));
   app.use("/scripts", express.static(path.join(frontendRoot, "scripts")));
-  app.use("/api", createApiRouter({ env, db, authService }));
+  app.use("/api", createApiRouter({ env, db, authService, taskService }));
 
   app.get("/login", redirectAuthenticatedUser, (req, res) => {
     res.sendFile(path.join(frontendRoot, "pages", "login.html"));
   });
 
-  app.get("/", requirePageAuth, (req, res) => {
-    res.sendFile(path.join(frontendRoot, "pages", "index.html"));
-  });
-
-  app.get("/security", requirePageAuth, (req, res) => {
+  app.get(["/", "/tasks", "/security"], requirePageAuth, (req, res) => {
     res.sendFile(path.join(frontendRoot, "pages", "index.html"));
   });
 
