@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-06-29
+
+### Added
+- Added a root `launcher.sh` helper to run install-checked app startup, development mode, migrations, setup, lint, and tests from one entry point.
+
+## [0.5.0] - 2026-06-29
+
+### Added
+- Added authenticated activity management with CRUD, status confirmation, soft delete, search, filters, sorting, and pagination.
+- Added fixed activity categories, Jakarta date and time validation, and server-derived computed activity statuses.
+- Added schedule conflict warnings for overlapping activities and routines without blocking saves.
+- Added responsive Aktivitas interfaces for list, detail, create, edit, confirmation, and deletion flows.
+- Added automated activity tests covering validation, ownership isolation, computed statuses, warnings, and response metadata.
+
+## [0.4.1] - 2026-06-28
+
+### Changed
+- Redesigned the authenticated application UI with a modern SaaS dashboard layout, stronger task hierarchy, compact metrics, and a more polished mobile experience.
+
 ## [0.4.0] - 2026-06-28
 
 ### Added

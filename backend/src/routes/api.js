@@ -2,12 +2,14 @@ const express = require("express");
 const { createSuccessResponse } = require("../http/response");
 const { createAuthRouter } = require("./auth");
 const { createTaskRouter } = require("./tasks");
+const { createActivityRouter } = require("./activities");
 
-function createApiRouter({ env, db, authService, taskService }) {
+function createApiRouter({ env, db, authService, taskService, activityService }) {
   const router = express.Router();
 
   router.use("/auth", createAuthRouter({ env, authService }));
   router.use("/tasks", createTaskRouter({ taskService }));
+  router.use("/activities", createActivityRouter({ activityService }));
 
   router.get("/health", (req, res) => {
     const tableCount = db

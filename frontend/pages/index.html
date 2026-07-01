@@ -9,228 +9,500 @@
   <body>
     <div class="shell">
       <aside class="sidebar" aria-label="Primary">
-        <div class="brand">
-          <p class="eyebrow">PPD</p>
-          <h1>Productivity Dashboard</h1>
-          <p class="subtle" data-user-summary>Memuat akun…</p>
+        <div class="brand brand-modern">
+          <div class="brand-mark" aria-hidden="true">P</div>
+          <div>
+            <p class="eyebrow">Personal Productivity Dashboard</p>
+            <h1>Control Center</h1>
+            <p class="subtle" data-user-summary>Memuat akun…</p>
+          </div>
         </div>
-        <nav class="nav-list">
-          <a href="/tasks" class="nav-link" data-nav-target="tasks">Pekerjaan</a>
-          <a href="/security" class="nav-link" data-nav-target="security">Keamanan</a>
-          <button type="button" class="nav-link nav-button" data-logout-button>Logout</button>
-        </nav>
+
+        <div class="sidebar-block">
+          <p class="sidebar-label">Workspace</p>
+          <nav class="nav-list">
+            <a href="/tasks" class="nav-link" data-nav-target="tasks">
+              <span class="nav-icon" aria-hidden="true">▣</span>
+              <span>Pekerjaan</span>
+            </a>
+            <a href="/activities" class="nav-link" data-nav-target="activities">
+              <span class="nav-icon" aria-hidden="true">◫</span>
+              <span>Aktivitas</span>
+            </a>
+            <a href="/security" class="nav-link" data-nav-target="security">
+              <span class="nav-icon" aria-hidden="true">◌</span>
+              <span>Keamanan</span>
+            </a>
+          </nav>
+        </div>
+
+        <div class="sidebar-card">
+          <p class="sidebar-label">Session</p>
+          <p class="subtle" data-session-summary>Memuat detail sesi…</p>
+          <button type="button" class="nav-link nav-button logout-sidebar" data-logout-button>Logout</button>
+        </div>
       </aside>
 
       <main class="content">
-        <header class="topbar">
-          <button class="menu-button" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu">
-            Menu
-          </button>
-          <div>
-            <p class="eyebrow">Phase 3 Task Management</p>
-            <h2>Pengelolaan Pekerjaan</h2>
+        <header class="topbar topbar-modern">
+          <div class="topbar-start">
+            <button class="menu-button" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu">
+              Menu
+            </button>
+            <div>
+              <p class="eyebrow" data-page-eyebrow>SaaS Workspace</p>
+              <h2 data-page-title>Operations</h2>
+            </div>
           </div>
-          <div class="server-time" data-server-time>Memuat waktu server…</div>
+          <div class="topbar-actions">
+            <div class="server-time server-time-modern" data-server-time>Memuat waktu server…</div>
+            <div class="hero-pill hero-pill-modern">Asia/Jakarta</div>
+          </div>
         </header>
 
-        <nav class="mobile-menu" id="mobile-menu" hidden aria-label="Mobile">
+        <nav class="mobile-menu mobile-menu-modern" id="mobile-menu" hidden aria-label="Mobile">
           <a href="/tasks" class="nav-link" data-nav-target="tasks">Pekerjaan</a>
+          <a href="/activities" class="nav-link" data-nav-target="activities">Aktivitas</a>
           <a href="/security" class="nav-link" data-nav-target="security">Keamanan</a>
           <button type="button" class="nav-link nav-button" data-logout-button>Logout</button>
         </nav>
 
-        <section class="hero-card" id="tasks-top">
-          <div>
-            <p class="eyebrow">Sesi Aktif</p>
+        <section class="hero-card hero-card-modern">
+          <div class="hero-copy">
+            <p class="eyebrow" data-hero-eyebrow>Operations Dashboard</p>
             <h3 data-display-name>Memuat…</h3>
-            <p class="subtle" data-session-summary>Memuat detail sesi…</p>
+            <p class="subtle" data-hero-description>Kelola modul produktivitas dari satu dashboard yang responsif.</p>
           </div>
-          <div class="hero-pill">Asia/Jakarta</div>
+          <div class="hero-spotlight">
+            <div class="hero-kpi">
+              <span class="hero-kpi-label" data-kpi-selected-label>Item terpilih</span>
+              <strong data-stat-selected>0</strong>
+            </div>
+            <div class="hero-kpi-grid">
+              <div class="metric-card metric-compact">
+                <span data-metric-total-label>Total</span>
+                <strong data-stat-total>0</strong>
+              </div>
+              <div class="metric-card metric-compact metric-alert">
+                <span data-metric-alert-label>Butuh perhatian</span>
+                <strong data-stat-alert>0</strong>
+              </div>
+            </div>
+          </div>
         </section>
 
-        <section class="grid grid-two grid-stack-responsive">
-          <article class="panel" id="task-editor">
-            <p class="panel-label">Form Pekerjaan</p>
-            <h3 data-task-form-title>Buat pekerjaan baru</h3>
-            <form class="auth-form compact-form" data-task-form novalidate>
-              <input type="hidden" name="task_id" value="">
-              <label class="field">
-                <span>Judul</span>
-                <input name="title" type="text" required>
-              </label>
-              <label class="field">
-                <span>Deskripsi</span>
-                <textarea name="description" rows="4"></textarea>
-              </label>
-              <div class="split-fields">
-                <label class="field">
-                  <span>Status</span>
-                  <select name="status">
-                    <option value="in_progress">Sedang berjalan</option>
-                    <option value="completed">Selesai</option>
-                    <option value="paused">Tertunda</option>
-                    <option value="cancelled">Dibatalkan</option>
-                  </select>
-                </label>
-                <label class="field">
-                  <span>Prioritas</span>
-                  <select name="priority">
-                    <option value="low">Rendah</option>
-                    <option value="medium" selected>Sedang</option>
-                    <option value="high">Tinggi</option>
-                    <option value="urgent">Mendesak</option>
-                  </select>
-                </label>
-              </div>
-              <div class="split-fields">
-                <label class="field">
-                  <span>Mulai</span>
-                  <input name="start_at" type="datetime-local" required>
-                </label>
-                <label class="field">
-                  <span>Deadline</span>
-                  <input name="deadline_at" type="datetime-local" required>
-                </label>
-              </div>
-              <p class="form-message" data-task-form-message aria-live="polite"></p>
-              <div class="button-row">
-                <button class="primary-button" type="submit" data-task-submit>Simpan pekerjaan</button>
-                <button class="secondary-button" type="button" data-task-reset>Reset</button>
-              </div>
-            </form>
+        <section class="metrics-grid">
+          <article class="metric-card metric-accent">
+            <span class="metric-label" data-metric-card-1-label>Semua item</span>
+            <strong data-stat-total>0</strong>
+            <p class="subtle" data-metric-card-1-desc>Jumlah item pada hasil filter saat ini.</p>
           </article>
-
-          <article class="panel" id="task-detail-panel">
-            <p class="panel-label">Detail Pekerjaan</p>
-            <h3>Ringkasan</h3>
-            <div data-task-detail class="empty-copy">Pilih pekerjaan dari daftar untuk melihat detail lengkap.</div>
+          <article class="metric-card">
+            <span class="metric-label" data-metric-card-2-label>Selesai</span>
+            <strong data-stat-secondary-1>0</strong>
+            <p class="subtle" data-metric-card-2-desc>Status selesai pada halaman aktif.</p>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label" data-metric-card-3-label>Aktif</span>
+            <strong data-stat-secondary-2>0</strong>
+            <p class="subtle" data-metric-card-3-desc>Item aktif yang masih berjalan.</p>
+          </article>
+          <article class="metric-card metric-alert">
+            <span class="metric-label" data-metric-card-4-label>Butuh perhatian</span>
+            <strong data-stat-alert>0</strong>
+            <p class="subtle" data-metric-card-4-desc>Item yang perlu ditinjau segera.</p>
           </article>
         </section>
 
-        <section class="panel">
-          <div class="section-heading">
-            <div>
-              <p class="panel-label">Filter dan Pencarian</p>
-              <h3>Kontrol daftar pekerjaan</h3>
-            </div>
-          </div>
-          <form class="filter-grid" data-task-filters>
-            <label class="field">
-              <span>Cari</span>
-              <input name="search" type="search" placeholder="Cari judul atau deskripsi">
-            </label>
-            <label class="field">
-              <span>Status</span>
-              <select name="status">
-                <option value="">Semua status</option>
-                <option value="in_progress">Sedang berjalan</option>
-                <option value="completed">Selesai</option>
-                <option value="paused">Tertunda</option>
-                <option value="cancelled">Dibatalkan</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Prioritas</span>
-              <select name="priority">
-                <option value="">Semua prioritas</option>
-                <option value="low">Rendah</option>
-                <option value="medium">Sedang</option>
-                <option value="high">Tinggi</option>
-                <option value="urgent">Mendesak</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Mulai dari</span>
-              <input name="start_from" type="datetime-local">
-            </label>
-            <label class="field">
-              <span>Mulai sampai</span>
-              <input name="start_to" type="datetime-local">
-            </label>
-            <label class="field">
-              <span>Deadline dari</span>
-              <input name="deadline_from" type="datetime-local">
-            </label>
-            <label class="field">
-              <span>Deadline sampai</span>
-              <input name="deadline_to" type="datetime-local">
-            </label>
-            <label class="field">
-              <span>Lewat deadline</span>
-              <select name="is_overdue">
-                <option value="">Semua</option>
-                <option value="true">Ya</option>
-                <option value="false">Tidak</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Urutkan</span>
-              <select name="sort">
-                <option value="created_at">Dibuat</option>
-                <option value="deadline_at">Deadline</option>
-                <option value="priority">Prioritas</option>
-                <option value="title">Judul</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Arah</span>
-              <select name="order">
-                <option value="desc">Turun</option>
-                <option value="asc">Naik</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>Per halaman</span>
-              <select name="page_size">
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-            </label>
-            <div class="filter-actions">
-              <button class="primary-button" type="submit">Terapkan</button>
-              <button class="secondary-button" type="button" data-clear-filters>Bersihkan</button>
-            </div>
-          </form>
-        </section>
+        <section class="workspace-grid">
+          <div class="workspace-main">
+            <section class="page-module" data-page-section="tasks">
+              <section class="panel panel-modern filter-panel">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Filter dan Pencarian</p>
+                    <h3>Task Explorer</h3>
+                  </div>
+                  <p class="subtle">Persempit data pekerjaan tanpa meninggalkan dashboard.</p>
+                </div>
+                <form class="filter-grid" data-task-filters>
+                  <label class="field">
+                    <span>Cari</span>
+                    <input name="search" type="search" placeholder="Cari judul atau deskripsi">
+                  </label>
+                  <label class="field">
+                    <span>Status</span>
+                    <select name="status">
+                      <option value="">Semua status</option>
+                      <option value="in_progress">Sedang berjalan</option>
+                      <option value="completed">Selesai</option>
+                      <option value="paused">Tertunda</option>
+                      <option value="cancelled">Dibatalkan</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Prioritas</span>
+                    <select name="priority">
+                      <option value="">Semua prioritas</option>
+                      <option value="low">Rendah</option>
+                      <option value="medium">Sedang</option>
+                      <option value="high">Tinggi</option>
+                      <option value="urgent">Mendesak</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Lewat deadline</span>
+                    <select name="is_overdue">
+                      <option value="">Semua</option>
+                      <option value="true">Ya</option>
+                      <option value="false">Tidak</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Mulai dari</span>
+                    <input name="start_from" type="datetime-local">
+                  </label>
+                  <label class="field">
+                    <span>Mulai sampai</span>
+                    <input name="start_to" type="datetime-local">
+                  </label>
+                  <label class="field">
+                    <span>Deadline dari</span>
+                    <input name="deadline_from" type="datetime-local">
+                  </label>
+                  <label class="field">
+                    <span>Deadline sampai</span>
+                    <input name="deadline_to" type="datetime-local">
+                  </label>
+                  <label class="field">
+                    <span>Urutkan</span>
+                    <select name="sort">
+                      <option value="created_at">Dibuat</option>
+                      <option value="deadline_at">Deadline</option>
+                      <option value="priority">Prioritas</option>
+                      <option value="title">Judul</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Arah</span>
+                    <select name="order">
+                      <option value="desc">Turun</option>
+                      <option value="asc">Naik</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Per halaman</span>
+                    <select name="page_size">
+                      <option value="20">20</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                  </label>
+                  <div class="filter-actions">
+                    <button class="primary-button" type="submit">Terapkan</button>
+                    <button class="secondary-button" type="button" data-task-clear-filters>Bersihkan</button>
+                  </div>
+                </form>
+              </section>
 
-        <section class="panel">
-          <div class="section-heading list-header">
-            <div>
-              <p class="panel-label">Daftar Pekerjaan</p>
-              <h3>Data pekerjaan</h3>
-            </div>
-            <p class="subtle" data-task-summary>Memuat daftar pekerjaan…</p>
-          </div>
-          <p class="form-message" data-task-list-message aria-live="polite"></p>
-          <div class="task-list" data-task-list></div>
-          <div class="pagination-row">
-            <button class="secondary-button" type="button" data-page-previous>Sebelumnya</button>
-            <span class="subtle" data-pagination-label>Halaman 1</span>
-            <button class="secondary-button" type="button" data-page-next>Berikutnya</button>
-          </div>
-        </section>
+              <section class="panel panel-modern list-panel">
+                <div class="section-heading section-heading-modern list-header">
+                  <div>
+                    <p class="panel-label">Daftar Pekerjaan</p>
+                    <h3>Execution Queue</h3>
+                  </div>
+                  <p class="subtle" data-task-summary>Memuat daftar pekerjaan…</p>
+                </div>
+                <p class="form-message" data-task-list-message aria-live="polite"></p>
+                <div class="task-list" data-task-list></div>
+                <div class="pagination-row">
+                  <button class="secondary-button" type="button" data-task-page-previous>Sebelumnya</button>
+                  <span class="subtle pagination-pill" data-task-pagination-label>Halaman 1</span>
+                  <button class="secondary-button" type="button" data-task-page-next>Berikutnya</button>
+                </div>
+              </section>
+            </section>
 
-        <section class="panel" id="security">
-          <p class="panel-label">Keamanan</p>
-          <h3>Ubah password</h3>
-          <p class="subtle" data-account-details>Memuat profil akun…</p>
-          <form class="auth-form compact-form" data-password-form novalidate>
-            <label class="field">
-              <span>Password saat ini</span>
-              <input name="current_password" type="password" autocomplete="current-password" required>
-            </label>
-            <label class="field">
-              <span>Password baru</span>
-              <input name="new_password" type="password" autocomplete="new-password" required>
-            </label>
-            <label class="field">
-              <span>Konfirmasi password baru</span>
-              <input name="confirm_password" type="password" autocomplete="new-password" required>
-            </label>
-            <p class="form-message" data-password-message aria-live="polite"></p>
-            <button class="primary-button" type="submit" data-password-submit>Update password</button>
-          </form>
+            <section class="page-module" data-page-section="activities">
+              <section class="panel panel-modern filter-panel">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Filter dan Pencarian</p>
+                    <h3>Activity Explorer</h3>
+                  </div>
+                  <p class="subtle">Telusuri aktivitas harian, status turunan, dan kebutuhan konfirmasi.</p>
+                </div>
+                <form class="filter-grid" data-activity-filters>
+                  <label class="field">
+                    <span>Cari</span>
+                    <input name="search" type="search" placeholder="Cari judul atau catatan">
+                  </label>
+                  <label class="field">
+                    <span>Kategori</span>
+                    <select name="category">
+                      <option value="">Semua kategori</option>
+                      <option value="pekerjaan">Pekerjaan</option>
+                      <option value="belajar">Belajar</option>
+                      <option value="olahraga">Olahraga</option>
+                      <option value="sosial">Sosial</option>
+                      <option value="pribadi">Pribadi</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Status utama</span>
+                    <select name="status">
+                      <option value="">Semua status</option>
+                      <option value="scheduled">Terjadwal</option>
+                      <option value="completed">Selesai</option>
+                      <option value="cancelled">Dibatalkan</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Urutkan</span>
+                    <select name="sort">
+                      <option value="activity_date">Tanggal</option>
+                      <option value="start_time">Jam mulai</option>
+                      <option value="end_time">Jam selesai</option>
+                      <option value="created_at">Dibuat</option>
+                      <option value="title">Judul</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Tanggal dari</span>
+                    <input name="date_from" type="date">
+                  </label>
+                  <label class="field">
+                    <span>Tanggal sampai</span>
+                    <input name="date_to" type="date">
+                  </label>
+                  <label class="field">
+                    <span>Jam mulai dari</span>
+                    <input name="start_time_from" type="time">
+                  </label>
+                  <label class="field">
+                    <span>Jam mulai sampai</span>
+                    <input name="start_time_to" type="time">
+                  </label>
+                  <label class="field">
+                    <span>Jam selesai dari</span>
+                    <input name="end_time_from" type="time">
+                  </label>
+                  <label class="field">
+                    <span>Jam selesai sampai</span>
+                    <input name="end_time_to" type="time">
+                  </label>
+                  <label class="field">
+                    <span>Arah</span>
+                    <select name="order">
+                      <option value="desc">Turun</option>
+                      <option value="asc">Naik</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Per halaman</span>
+                    <select name="page_size">
+                      <option value="20">20</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                  </label>
+                  <div class="filter-actions">
+                    <button class="primary-button" type="submit">Terapkan</button>
+                    <button class="secondary-button" type="button" data-activity-clear-filters>Bersihkan</button>
+                  </div>
+                </form>
+              </section>
+
+              <section class="panel panel-modern list-panel">
+                <div class="section-heading section-heading-modern list-header">
+                  <div>
+                    <p class="panel-label">Daftar Aktivitas</p>
+                    <h3>Daily Timeline</h3>
+                  </div>
+                  <p class="subtle" data-activity-summary>Memuat daftar aktivitas…</p>
+                </div>
+                <p class="form-message" data-activity-list-message aria-live="polite"></p>
+                <div class="task-list" data-activity-list></div>
+                <div class="pagination-row">
+                  <button class="secondary-button" type="button" data-activity-page-previous>Sebelumnya</button>
+                  <span class="subtle pagination-pill" data-activity-pagination-label>Halaman 1</span>
+                  <button class="secondary-button" type="button" data-activity-page-next>Berikutnya</button>
+                </div>
+              </section>
+            </section>
+          </div>
+
+          <aside class="workspace-side">
+            <section class="page-module" data-page-section="tasks">
+              <article class="panel panel-modern panel-emphasis" id="task-editor">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Task Composer</p>
+                    <h3 data-task-form-title>Buat pekerjaan baru</h3>
+                  </div>
+                  <span class="panel-chip">Create / Edit</span>
+                </div>
+                <form class="auth-form compact-form" data-task-form novalidate>
+                  <input type="hidden" name="task_id" value="">
+                  <label class="field">
+                    <span>Judul</span>
+                    <input name="title" type="text" required>
+                  </label>
+                  <label class="field">
+                    <span>Deskripsi</span>
+                    <textarea name="description" rows="4"></textarea>
+                  </label>
+                  <div class="split-fields split-fields-modern">
+                    <label class="field">
+                      <span>Status</span>
+                      <select name="status">
+                        <option value="in_progress">Sedang berjalan</option>
+                        <option value="completed">Selesai</option>
+                        <option value="paused">Tertunda</option>
+                        <option value="cancelled">Dibatalkan</option>
+                      </select>
+                    </label>
+                    <label class="field">
+                      <span>Prioritas</span>
+                      <select name="priority">
+                        <option value="low">Rendah</option>
+                        <option value="medium" selected>Sedang</option>
+                        <option value="high">Tinggi</option>
+                        <option value="urgent">Mendesak</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="split-fields split-fields-modern">
+                    <label class="field">
+                      <span>Mulai</span>
+                      <input name="start_at" type="datetime-local" required>
+                    </label>
+                    <label class="field">
+                      <span>Deadline</span>
+                      <input name="deadline_at" type="datetime-local" required>
+                    </label>
+                  </div>
+                  <p class="form-message" data-task-form-message aria-live="polite"></p>
+                  <div class="button-row">
+                    <button class="primary-button" type="submit" data-task-submit>Simpan pekerjaan</button>
+                    <button class="secondary-button" type="button" data-task-reset>Reset</button>
+                  </div>
+                </form>
+              </article>
+
+              <article class="panel panel-modern" id="task-detail-panel">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Detail Pekerjaan</p>
+                    <h3>Task Inspector</h3>
+                  </div>
+                  <span class="panel-chip panel-chip-soft">Live Detail</span>
+                </div>
+                <div data-task-detail class="empty-copy">Pilih pekerjaan dari daftar untuk melihat detail lengkap.</div>
+              </article>
+            </section>
+
+            <section class="page-module" data-page-section="activities">
+              <article class="panel panel-modern panel-emphasis" id="activity-editor">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Tambah Aktivitas</p>
+                    <h3 data-activity-form-title>Buat aktivitas baru</h3>
+                  </div>
+                  <span class="panel-chip">Create / Edit</span>
+                </div>
+                <form class="auth-form compact-form" data-activity-form novalidate>
+                  <input type="hidden" name="activity_id" value="">
+                  <label class="field">
+                    <span>Judul</span>
+                    <input name="title" type="text" required>
+                  </label>
+                  <label class="field">
+                    <span>Kategori</span>
+                    <select name="category" required>
+                      <option value="pekerjaan">Pekerjaan</option>
+                      <option value="belajar">Belajar</option>
+                      <option value="olahraga">Olahraga</option>
+                      <option value="sosial">Sosial</option>
+                      <option value="pribadi">Pribadi</option>
+                    </select>
+                  </label>
+                  <div class="split-fields split-fields-modern">
+                    <label class="field">
+                      <span>Tanggal</span>
+                      <input name="activity_date" type="date" required>
+                    </label>
+                    <label class="field">
+                      <span>Status utama</span>
+                      <select name="status">
+                        <option value="scheduled">Terjadwal</option>
+                        <option value="completed">Selesai</option>
+                        <option value="cancelled">Dibatalkan</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="split-fields split-fields-modern">
+                    <label class="field">
+                      <span>Jam mulai</span>
+                      <input name="start_time" type="time" required>
+                    </label>
+                    <label class="field">
+                      <span>Jam selesai</span>
+                      <input name="end_time" type="time" required>
+                    </label>
+                  </div>
+                  <label class="field">
+                    <span>Catatan</span>
+                    <textarea name="notes" rows="4"></textarea>
+                  </label>
+                  <p class="form-message" data-activity-form-message aria-live="polite"></p>
+                  <div class="warning-stack" data-activity-warning-list></div>
+                  <div class="button-row">
+                    <button class="primary-button" type="submit" data-activity-submit>Simpan aktivitas</button>
+                    <button class="secondary-button" type="button" data-activity-reset>Reset</button>
+                  </div>
+                </form>
+              </article>
+
+              <article class="panel panel-modern" id="activity-detail-panel">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Detail Aktivitas</p>
+                    <h3>Activity Inspector</h3>
+                  </div>
+                  <span class="panel-chip panel-chip-soft">Live Detail</span>
+                </div>
+                <div data-activity-detail class="empty-copy">Pilih aktivitas dari daftar untuk melihat detail lengkap.</div>
+              </article>
+            </section>
+
+            <article class="panel panel-modern" id="security">
+              <div class="section-heading section-heading-modern">
+                <div>
+                  <p class="panel-label">Keamanan</p>
+                  <h3>Access Settings</h3>
+                </div>
+                <span class="panel-chip panel-chip-soft">Password</span>
+              </div>
+              <p class="subtle" data-account-details>Memuat profil akun…</p>
+              <form class="auth-form compact-form" data-password-form novalidate>
+                <label class="field">
+                  <span>Password saat ini</span>
+                  <input name="current_password" type="password" autocomplete="current-password" required>
+                </label>
+                <label class="field">
+                  <span>Password baru</span>
+                  <input name="new_password" type="password" autocomplete="new-password" required>
+                </label>
+                <label class="field">
+                  <span>Konfirmasi password baru</span>
+                  <input name="confirm_password" type="password" autocomplete="new-password" required>
+                </label>
+                <p class="form-message" data-password-message aria-live="polite"></p>
+                <button class="primary-button" type="submit" data-password-submit>Update password</button>
+              </form>
+            </article>
+          </aside>
         </section>
       </main>
     </div>

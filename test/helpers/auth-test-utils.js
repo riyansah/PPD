@@ -76,7 +76,8 @@ function request(server, { method = "GET", path: route = "/", body, headers = {}
   });
 }
 
-async function createHarness(envOverrides = {}) {
+async function createHarness(options = {}) {
+  const { nowProvider, ...envOverrides } = options;
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ppd-auth-"));
   const databasePath = path.join(tempDir, "app.sqlite");
   const env = createEnv({
@@ -100,7 +101,7 @@ async function createHarness(envOverrides = {}) {
     sessionRepository: createSessionRepository(db),
     loginRateLimitRepository: createLoginRateLimitRepository(db)
   });
-  const app = createApp({ env, db, logger });
+  const app = createApp({ env, db, logger, nowProvider });
   const server = app.listen(0);
 
   return {

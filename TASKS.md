@@ -89,22 +89,22 @@ Acceptance:
 
 ## Fase 4. Modul Aktivitas
 
-- [ ] Buat tabel/query CRUD aktivitas.
-- [ ] Implementasi endpoint daftar, detail, create, update, delete.
-- [ ] Implementasi endpoint ubah status.
-- [ ] Tambahkan kategori tetap.
-- [ ] Tambahkan validasi tanggal dan jam.
-- [ ] Tambahkan deteksi benturan aktivitas-aktivitas.
-- [ ] Tambahkan deteksi benturan aktivitas-rutinitas.
-- [ ] Implementasi status turunan untuk dashboard.
-- [ ] Implementasi konfirmasi aktivitas yang sudah lewat waktu.
-- [ ] Bangun UI daftar, form, dan detail aktivitas.
+- [x] Buat tabel/query CRUD aktivitas.
+- [x] Implementasi endpoint daftar, detail, create, update, delete.
+- [x] Implementasi endpoint ubah status.
+- [x] Tambahkan kategori tetap.
+- [x] Tambahkan validasi tanggal dan jam.
+- [x] Tambahkan deteksi benturan aktivitas-aktivitas.
+- [x] Tambahkan deteksi benturan aktivitas-rutinitas.
+- [x] Implementasi status turunan untuk dashboard.
+- [x] Implementasi konfirmasi aktivitas yang sudah lewat waktu.
+- [x] Bangun UI daftar, form, dan detail aktivitas.
 
 Acceptance:
 
-- [ ] CRUD aktivitas berjalan.
-- [ ] Benturan terdeteksi sebagai peringatan.
-- [ ] Aktivitas lewat waktu tetap tampil sampai dikonfirmasi.
+- [x] CRUD aktivitas berjalan.
+- [x] Benturan terdeteksi sebagai peringatan.
+- [x] Aktivitas lewat waktu tetap tampil sampai dikonfirmasi.
 
 ## Fase 5. Modul Rutinitas dan Riwayat
 

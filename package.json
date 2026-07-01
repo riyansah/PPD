@@ -1,12 +1,13 @@
 {
   "name": "personal-productivity-dashboard",
-  "version": "0.4.0",
+  "version": "0.5.1",
   "private": true,
   "description": "Personal Productivity Dashboard foundation",
   "main": "backend/src/server.js",
   "scripts": {
     "dev": "node --watch backend/src/server.js",
     "start": "node backend/src/server.js",
+    "launcher": "./launcher.sh",
     "migrate": "node backend/src/db/migrate.js",
     "setup:account": "node backend/src/cli/setup-account.js",
     "test": "node --test",

@@ -14,16 +14,19 @@ const { createUserRepository } = require("./repositories/user-repository");
 const { createSessionRepository } = require("./repositories/session-repository");
 const { createLoginRateLimitRepository } = require("./repositories/login-rate-limit-repository");
 const { createTaskRepository } = require("./repositories/task-repository");
+const { createActivityRepository } = require("./repositories/activity-repository");
 const { createAuthService } = require("./services/auth-service");
 const { createTaskService } = require("./services/task-service");
+const { createActivityService } = require("./services/activity-service");
 
-function createApp({ env, db, logger }) {
+function createApp({ env, db, logger, nowProvider }) {
   const app = express();
   const frontendRoot = path.resolve(__dirname, "..", "..", "frontend");
   const userRepository = createUserRepository(db);
   const sessionRepository = createSessionRepository(db);
   const loginRateLimitRepository = createLoginRateLimitRepository(db);
   const taskRepository = createTaskRepository(db);
+  const activityRepository = createActivityRepository(db);
   const authService = createAuthService({
     env,
     db,
@@ -33,6 +36,7 @@ function createApp({ env, db, logger }) {
     loginRateLimitRepository
   });
   const taskService = createTaskService({ taskRepository });
+  const activityService = createActivityService({ activityRepository, nowProvider });
 
   app.disable("x-powered-by");
   app.use(requestContextMiddleware);
@@ -44,13 +48,13 @@ function createApp({ env, db, logger }) {
   app.use("/assets", express.static(path.join(frontendRoot, "assets")));
   app.use("/styles", express.static(path.join(frontendRoot, "styles")));
   app.use("/scripts", express.static(path.join(frontendRoot, "scripts")));
-  app.use("/api", createApiRouter({ env, db, authService, taskService }));
+  app.use("/api", createApiRouter({ env, db, authService, taskService, activityService }));
 
   app.get("/login", redirectAuthenticatedUser, (req, res) => {
     res.sendFile(path.join(frontendRoot, "pages", "login.html"));
   });
 
-  app.get(["/", "/tasks", "/security"], requirePageAuth, (req, res) => {
+  app.get(["/", "/tasks", "/activities", "/security"], requirePageAuth, (req, res) => {
     res.sendFile(path.join(frontendRoot, "pages", "index.html"));
   });
 
