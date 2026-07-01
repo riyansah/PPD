@@ -21,6 +21,10 @@
         <div class="sidebar-block">
           <p class="sidebar-label">Workspace</p>
           <nav class="nav-list">
+            <a href="/dashboard" class="nav-link" data-nav-target="dashboard">
+              <span class="nav-icon" aria-hidden="true">◈</span>
+              <span>Dashboard</span>
+            </a>
             <a href="/tasks" class="nav-link" data-nav-target="tasks">
               <span class="nav-icon" aria-hidden="true">▣</span>
               <span>Pekerjaan</span>
@@ -65,6 +69,7 @@
         </header>
 
         <nav class="mobile-menu mobile-menu-modern" id="mobile-menu" hidden aria-label="Mobile">
+          <a href="/dashboard" class="nav-link" data-nav-target="dashboard">Dashboard</a>
           <a href="/tasks" class="nav-link" data-nav-target="tasks">Pekerjaan</a>
           <a href="/activities" class="nav-link" data-nav-target="activities">Aktivitas</a>
           <a href="/routines" class="nav-link" data-nav-target="routines">Rutinitas</a>
@@ -121,6 +126,48 @@
 
         <section class="workspace-grid">
           <div class="workspace-main">
+            <section class="page-module" data-page-section="dashboard">
+              <section class="panel panel-modern list-panel">
+                <div class="section-heading section-heading-modern list-header">
+                  <div>
+                    <p class="panel-label">Ringkasan Dashboard</p>
+                    <h3>Productivity Overview</h3>
+                  </div>
+                  <label class="field dashboard-period-field">
+                    <span>Periode grafik</span>
+                    <select data-dashboard-period>
+                      <option value="weekly">Mingguan</option>
+                      <option value="monthly">Bulanan</option>
+                    </select>
+                  </label>
+                </div>
+                <p class="form-message" data-dashboard-message aria-live="polite">Memuat dashboard…</p>
+                <div class="dashboard-summary-grid" data-dashboard-summary></div>
+              </section>
+
+              <section class="panel panel-modern list-panel">
+                <div class="section-heading section-heading-modern list-header">
+                  <div>
+                    <p class="panel-label">Agenda Hari Ini</p>
+                    <h3>Aktivitas dan Rutinitas</h3>
+                  </div>
+                  <span class="panel-chip panel-chip-soft">Server based</span>
+                </div>
+                <div class="task-list" data-dashboard-today></div>
+              </section>
+
+              <section class="panel panel-modern list-panel">
+                <div class="section-heading section-heading-modern list-header">
+                  <div>
+                    <p class="panel-label">Grafik Dashboard</p>
+                    <h3>Status dan Kategori</h3>
+                  </div>
+                  <p class="subtle" data-dashboard-chart-range>Periode mingguan</p>
+                </div>
+                <div class="dashboard-chart-grid" data-dashboard-charts></div>
+              </section>
+            </section>
+
             <section class="page-module" data-page-section="tasks">
               <section class="panel panel-modern filter-panel">
                 <div class="section-heading section-heading-modern">
@@ -433,6 +480,19 @@
           </div>
 
           <aside class="workspace-side">
+            <section class="page-module" data-page-section="dashboard">
+              <article class="panel panel-modern panel-emphasis">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Deadline Terdekat</p>
+                    <h3>Countdown</h3>
+                  </div>
+                  <span class="panel-chip">DD:HH:MM:SS</span>
+                </div>
+                <div class="task-list compact-list" data-dashboard-deadlines></div>
+              </article>
+            </section>
+
             <section class="page-module" data-page-section="tasks">
               <article class="panel panel-modern panel-emphasis" id="task-editor">
                 <div class="section-heading section-heading-modern">

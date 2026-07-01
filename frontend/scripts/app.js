@@ -52,12 +52,22 @@ const ROUTINE_HISTORY_STATUS_LABELS = {
 };
 
 const WIB_OFFSET_MINUTES = 7 * 60;
+const DASHBOARD_PAGE = "/dashboard";
 const TASK_PAGE = "/tasks";
 const ACTIVITY_PAGE = "/activities";
 const ROUTINE_PAGE = "/routines";
 const SECURITY_PAGE = "/security";
 
 const state = {
+  dashboard: {
+    summary: null,
+    today: [],
+    deadlines: [],
+    charts: null,
+    countdownTimer: null,
+    serverTimeBase: null,
+    clientTimeBase: null
+  },
   activities: [],
   activityEditingId: null,
   activityPagination: {
@@ -90,6 +100,13 @@ const state = {
 };
 
 const elements = {
+  dashboardChartRange: document.querySelector("[data-dashboard-chart-range]"),
+  dashboardCharts: document.querySelector("[data-dashboard-charts]"),
+  dashboardDeadlines: document.querySelector("[data-dashboard-deadlines]"),
+  dashboardMessage: document.querySelector("[data-dashboard-message]"),
+  dashboardPeriod: document.querySelector("[data-dashboard-period]"),
+  dashboardSummary: document.querySelector("[data-dashboard-summary]"),
+  dashboardToday: document.querySelector("[data-dashboard-today]"),
   accountDetails: document.querySelector("[data-account-details]"),
   activityDetail: document.querySelector("[data-activity-detail]"),
   activityFiltersForm: document.querySelector("[data-activity-filters]"),
@@ -302,6 +319,247 @@ function getErrorMessage(payload, fallback) {
   return fallback;
 }
 
+
+function formatCountdown(seconds) {
+  const totalSeconds = Math.max(0, Number(seconds) || 0);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const remainingSeconds = totalSeconds % 60;
+  return `${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(remainingSeconds)}`;
+}
+
+function getEstimatedServerNow() {
+  if (!state.dashboard.serverTimeBase || !state.dashboard.clientTimeBase) {
+    return state.serverTime ? new Date(state.serverTime) : new Date();
+  }
+
+  return new Date(state.dashboard.serverTimeBase.getTime() + (Date.now() - state.dashboard.clientTimeBase));
+}
+
+function syncDashboardClock(serverTime) {
+  if (!serverTime) {
+    return;
+  }
+
+  state.dashboard.serverTimeBase = new Date(serverTime);
+  state.dashboard.clientTimeBase = Date.now();
+}
+
+function renderDashboardSummary() {
+  if (!elements.dashboardSummary) {
+    return;
+  }
+
+  const summary = state.dashboard.summary;
+  if (!summary) {
+    elements.dashboardSummary.innerHTML = '<div class="empty-copy">Ringkasan dashboard belum tersedia.</div>';
+    return;
+  }
+
+  const cards = [
+    ["Total pekerjaan", summary.task_counts.total],
+    ["Sedang berjalan", summary.task_counts.in_progress],
+    ["Selesai", summary.task_counts.completed],
+    ["Tertunda", summary.task_counts.paused],
+    ["Aktivitas hari ini", summary.activity_counts.today],
+    ["Rutinitas hari ini", summary.routine_counts.today],
+    ["Lewat deadline", summary.task_counts.overdue],
+    ["Pekerjaan selesai", `${summary.task_completion_percentage}%`]
+  ];
+
+  elements.dashboardSummary.innerHTML = cards.map(([label, value], index) => `
+    <article class="metric-card ${index === 0 ? "metric-accent" : index === 6 ? "metric-alert" : ""}">
+      <span class="metric-label">${escapeHtml(label)}</span>
+      <strong>${escapeHtml(String(value))}</strong>
+    </article>
+  `).join("");
+}
+
+function renderDashboardToday() {
+  if (!elements.dashboardToday) {
+    return;
+  }
+
+  const items = state.dashboard.today;
+  if (!items.length) {
+    elements.dashboardToday.innerHTML = '<div class="empty-copy">Tidak ada agenda aktif untuk hari ini.</div>';
+    return;
+  }
+
+  elements.dashboardToday.innerHTML = items.map((item) => {
+    const isRoutine = item.entity_type === "routine";
+    const statusLabel = isRoutine
+      ? ROUTINE_HISTORY_STATUS_LABELS[item.computed_status] || item.computed_status
+      : ACTIVITY_COMPUTED_STATUS_LABELS[item.computed_status] || item.computed_status;
+    const secondary = isRoutine
+      ? `Prioritas ${PRIORITY_LABELS[item.priority] || item.priority || "-"}`
+      : ACTIVITY_CATEGORY_LABELS[item.category] || item.category || "-";
+
+    return `
+      <article class="task-card dashboard-agenda-card">
+        <div class="task-card-main">
+          <div class="task-card-heading">
+            <div>
+              <p class="panel-label">${escapeHtml(item.label)}</p>
+              <h4>${escapeHtml(item.title)}</h4>
+              <p class="subtle">${escapeHtml(item.start_time)} - ${escapeHtml(item.end_time)} · ${escapeHtml(secondary)}</p>
+            </div>
+            <div class="task-badges">
+              <span class="badge ${isRoutine ? "badge-routine" : "badge-status"}">${escapeHtml(item.label)}</span>
+              <span class="badge ${item.actionable ? "badge-overdue" : "badge-status"}">${escapeHtml(statusLabel)}</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderDashboardDeadlines() {
+  if (!elements.dashboardDeadlines) {
+    return;
+  }
+
+  const items = state.dashboard.deadlines;
+  if (!items.length) {
+    elements.dashboardDeadlines.innerHTML = '<div class="empty-copy">Tidak ada pekerjaan aktif dengan deadline.</div>';
+    return;
+  }
+
+  const now = getEstimatedServerNow();
+  elements.dashboardDeadlines.innerHTML = items.map((item) => {
+    const remaining = Math.max(0, Math.floor((new Date(item.deadline_at).getTime() - now.getTime()) / 1000));
+    const isOverdue = item.is_overdue || remaining === 0;
+
+    return `
+      <article class="deadline-card">
+        <div>
+          <p class="panel-label">Task #${escapeHtml(String(item.id))}</p>
+          <h4>${escapeHtml(item.title)}</h4>
+          <p class="subtle">${escapeHtml(formatDateTime(item.deadline_at))}</p>
+        </div>
+        <div class="task-badges">
+          <span class="badge badge-priority">${escapeHtml(PRIORITY_LABELS[item.priority] || item.priority)}</span>
+          <span class="badge ${isOverdue ? "badge-overdue" : "badge-status"}">${isOverdue ? "Terlambat" : escapeHtml(formatCountdown(remaining))}</span>
+        </div>
+        <a class="secondary-button deadline-link" href="/tasks">Lihat detail</a>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderChartBlock(title, data, labels) {
+  const entries = Object.entries(labels).map(([key, label]) => [key, label, Number(data[key] || 0)]);
+  const maxValue = Math.max(1, ...entries.map(([, , value]) => value));
+
+  return `
+    <article class="chart-card">
+      <h4>${escapeHtml(title)}</h4>
+      <div class="chart-bars">
+        ${entries.map(([key, label, value]) => `
+          <div class="chart-row">
+            <span>${escapeHtml(label)}</span>
+            <div class="chart-track"><div class="chart-bar chart-bar-${escapeHtml(key)}" style="width: ${Math.round((value / maxValue) * 100)}%"></div></div>
+            <strong>${escapeHtml(String(value))}</strong>
+          </div>
+        `).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderDashboardCharts() {
+  if (!elements.dashboardCharts) {
+    return;
+  }
+
+  const charts = state.dashboard.charts;
+  if (!charts) {
+    elements.dashboardCharts.innerHTML = '<div class="empty-copy">Grafik dashboard belum tersedia.</div>';
+    return;
+  }
+
+  elements.dashboardChartRange.textContent = `${charts.period === "monthly" ? "Bulanan" : "Mingguan"}: ${formatLocalDate(charts.range.start_date)} - ${formatLocalDate(charts.range.end_date)}`;
+  elements.dashboardCharts.innerHTML = [
+    renderChartBlock("Pekerjaan", charts.tasks_by_status, {
+      in_progress: "Berjalan",
+      completed: "Selesai",
+      paused: "Tertunda",
+      cancelled: "Dibatalkan",
+      overdue: "Lewat deadline"
+    }),
+    renderChartBlock("Aktivitas", charts.activities_by_status, {
+      scheduled: "Terjadwal",
+      completed: "Selesai",
+      cancelled: "Dibatalkan",
+      pending_confirmation: "Belum dikonfirmasi"
+    }),
+    renderChartBlock("Kategori Aktivitas", charts.activities_by_category, ACTIVITY_CATEGORY_LABELS)
+  ].join("");
+}
+
+function updateDashboardMetrics() {
+  const summary = state.dashboard.summary;
+  if (!summary) {
+    setText(elements.statTotal, "0");
+    setText(elements.statSecondary1, "0");
+    setText(elements.statSecondary2, "0");
+    setText(elements.statAlert, "0");
+    setText(elements.statSelected, "0");
+    return;
+  }
+
+  setText(elements.statTotal, String(summary.task_counts.total));
+  setText(elements.statSecondary1, String(summary.task_counts.completed));
+  setText(elements.statSecondary2, String(summary.activity_counts.today + summary.routine_counts.today));
+  setText(elements.statAlert, String(summary.task_counts.overdue));
+  setText(elements.statSelected, `${summary.task_completion_percentage}%`);
+}
+
+function startDashboardCountdown() {
+  if (state.dashboard.countdownTimer) {
+    window.clearInterval(state.dashboard.countdownTimer);
+  }
+
+  state.dashboard.countdownTimer = window.setInterval(renderDashboardDeadlines, 1000);
+}
+
+async function loadDashboard() {
+  const period = elements.dashboardPeriod ? elements.dashboardPeriod.value : "weekly";
+  setMessage(elements.dashboardMessage, "Memuat dashboard…", "");
+
+  const [summaryResult, todayResult, deadlinesResult, chartsResult] = await Promise.all([
+    requestJson(`/api/dashboard/summary?period=${encodeURIComponent(period)}`),
+    requestJson("/api/dashboard/today"),
+    requestJson("/api/dashboard/deadlines"),
+    requestJson(`/api/dashboard/charts?period=${encodeURIComponent(period)}`)
+  ]);
+
+  const firstPayload = summaryResult.payload || todayResult.payload || deadlinesResult.payload || chartsResult.payload;
+  setServerTime(firstPayload && firstPayload.meta ? firstPayload.meta.server_time : null);
+  syncDashboardClock(firstPayload && firstPayload.meta ? firstPayload.meta.server_time : null);
+
+  const failed = [summaryResult, todayResult, deadlinesResult, chartsResult].find((result) => !result.response.ok);
+  if (failed) {
+    setMessage(elements.dashboardMessage, getErrorMessage(failed.payload, "Gagal memuat dashboard."), "error");
+    return;
+  }
+
+  state.dashboard.summary = summaryResult.payload.data;
+  state.dashboard.today = todayResult.payload.data.items;
+  state.dashboard.deadlines = deadlinesResult.payload.data.items;
+  state.dashboard.charts = chartsResult.payload.data;
+
+  renderDashboardSummary();
+  renderDashboardToday();
+  renderDashboardDeadlines();
+  renderDashboardCharts();
+  updateDashboardMetrics();
+  startDashboardCountdown();
+  setMessage(elements.dashboardMessage, "", "");
+}
+
 function formatWeekdays(days) {
   if (!Array.isArray(days) || days.length === 0) {
     return "-";
@@ -311,6 +569,10 @@ function formatWeekdays(days) {
 }
 
 function getCurrentPath() {
+  if (window.location.pathname === "/" || window.location.pathname === DASHBOARD_PAGE) {
+    return DASHBOARD_PAGE;
+  }
+
   if (window.location.pathname === ACTIVITY_PAGE) {
     return ACTIVITY_PAGE;
   }
@@ -336,6 +598,10 @@ function setServerTime(serverTime) {
 }
 
 function pathForTarget(target) {
+  if (target === "dashboard") {
+    return DASHBOARD_PAGE;
+  }
+
   if (target === "activities") {
     return ACTIVITY_PAGE;
   }
@@ -367,6 +633,25 @@ function setPageVisibility() {
 
 function setPageCopy() {
   const currentPath = getCurrentPath();
+
+  if (currentPath === DASHBOARD_PAGE) {
+    elements.pageEyebrow.textContent = "Control Center";
+    elements.pageTitle.textContent = "Dashboard";
+    elements.heroEyebrow.textContent = "Productivity Command Center";
+    elements.heroDescription.textContent = "Pantau statistik, agenda hari ini, deadline terdekat, dan grafik produktivitas dengan acuan waktu server.";
+    elements.metricTotalLabel.textContent = "Total pekerjaan";
+    elements.metricAlertLabel.textContent = "Lewat deadline";
+    elements.metricCard1Label.textContent = "Total pekerjaan";
+    elements.metricCard1Desc.textContent = "Semua pekerjaan aktif maupun historis yang belum dihapus.";
+    elements.metricCard2Label.textContent = "Selesai";
+    elements.metricCard2Desc.textContent = "Jumlah pekerjaan selesai.";
+    elements.metricCard3Label.textContent = "Agenda hari ini";
+    elements.metricCard3Desc.textContent = "Gabungan aktivitas dan rutinitas hari ini.";
+    elements.metricCard4Label.textContent = "Lewat deadline";
+    elements.metricCard4Desc.textContent = "Pekerjaan aktif yang melewati deadline.";
+    elements.kpiSelectedLabel.textContent = "Penyelesaian";
+    return;
+  }
 
   if (currentPath === ACTIVITY_PAGE) {
     elements.pageEyebrow.textContent = "Activity Workspace";
@@ -425,6 +710,11 @@ function setPageCopy() {
 
 function updateOverviewMetrics() {
   const currentPath = getCurrentPath();
+
+  if (currentPath === DASHBOARD_PAGE) {
+    updateDashboardMetrics();
+    return;
+  }
 
   if (currentPath === ACTIVITY_PAGE) {
     const completed = state.activities.filter((activity) => activity.status === "completed").length;
@@ -1608,6 +1898,9 @@ function handleRoutineDetailClick(event) {
 }
 
 function bindEvents() {
+  if (elements.dashboardPeriod) {
+    elements.dashboardPeriod.addEventListener("change", loadDashboard);
+  }
   elements.taskForm.addEventListener("submit", submitTaskForm);
   elements.taskReset.addEventListener("click", resetTaskForm);
   elements.taskFiltersForm.addEventListener("submit", async (event) => {
@@ -1741,7 +2034,9 @@ async function boot() {
 
     renderSession(sessionData);
 
-    if (getCurrentPath() === ACTIVITY_PAGE) {
+    if (getCurrentPath() === DASHBOARD_PAGE) {
+      await loadDashboard();
+    } else if (getCurrentPath() === ACTIVITY_PAGE) {
       await loadActivities(1);
     } else if (getCurrentPath() === ROUTINE_PAGE) {
       await loadRoutines(1);

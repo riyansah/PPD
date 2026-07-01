@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-01
+
+### Added
+- Added authenticated dashboard summary, today agenda, deadline countdown, and chart endpoints.
+- Added responsive dashboard UI with summary cards, server-time countdowns, combined activity and routine agenda, and weekly or monthly charts.
+- Added automated dashboard tests covering authentication, summary counts, agenda labels, countdowns, chart data, and query validation.
+
 ## [0.6.0] - 2026-07-01
 
 ### Added

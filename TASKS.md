@@ -128,22 +128,22 @@ Acceptance:
 
 ## Fase 6. Dashboard dan Grafik
 
-- [ ] Implementasi `GET /api/dashboard/summary`.
-- [ ] Implementasi `GET /api/dashboard/today`.
-- [ ] Implementasi `GET /api/dashboard/deadlines`.
-- [ ] Implementasi `GET /api/dashboard/charts`.
-- [ ] Bangun kartu ringkasan dashboard.
-- [ ] Bangun daftar deadline terdekat.
-- [ ] Bangun agenda hari ini gabungan aktivitas dan rutinitas.
-- [ ] Bangun grafik mingguan dan bulanan.
-- [ ] Implementasi countdown berbasis waktu server.
-- [ ] Tambahkan empty state dan loading state.
+- [x] Implementasi `GET /api/dashboard/summary`.
+- [x] Implementasi `GET /api/dashboard/today`.
+- [x] Implementasi `GET /api/dashboard/deadlines`.
+- [x] Implementasi `GET /api/dashboard/charts`.
+- [x] Bangun kartu ringkasan dashboard.
+- [x] Bangun daftar deadline terdekat.
+- [x] Bangun agenda hari ini gabungan aktivitas dan rutinitas.
+- [x] Bangun grafik mingguan dan bulanan.
+- [x] Implementasi countdown berbasis waktu server.
+- [x] Tambahkan empty state dan loading state.
 
 Acceptance:
 
-- [ ] Dashboard menampilkan data inti yang benar.
-- [ ] Countdown tampil dengan format PRD dan memakai waktu server.
-- [ ] Agenda hari ini membedakan aktivitas dan rutinitas.
+- [x] Dashboard menampilkan data inti yang benar.
+- [x] Countdown tampil dengan format PRD dan memakai waktu server.
+- [x] Agenda hari ini membedakan aktivitas dan rutinitas.
 
 ## Fase 7. Laporan dan Ekspor
 
