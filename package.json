@@ -1,6 +1,6 @@
 {
   "name": "personal-productivity-dashboard",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": true,
   "description": "Personal Productivity Dashboard foundation",
   "main": "backend/src/server.js",

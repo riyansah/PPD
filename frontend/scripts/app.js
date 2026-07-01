@@ -34,10 +34,29 @@ const ACTIVITY_COMPUTED_STATUS_LABELS = {
   cancelled: "Dibatalkan"
 };
 
+const WEEKDAY_LABELS = {
+  1: "Senin",
+  2: "Selasa",
+  3: "Rabu",
+  4: "Kamis",
+  5: "Jumat",
+  6: "Sabtu",
+  7: "Minggu"
+};
+
+const ROUTINE_HISTORY_STATUS_LABELS = {
+  missed_pending: "Menunggu konfirmasi",
+  completed: "Selesai",
+  missed: "Terlewat",
+  cancelled: "Dibatalkan"
+};
+
 const WIB_OFFSET_MINUTES = 7 * 60;
 const TASK_PAGE = "/tasks";
 const ACTIVITY_PAGE = "/activities";
+const ROUTINE_PAGE = "/routines";
 const SECURITY_PAGE = "/security";
+
 const state = {
   activities: [],
   activityEditingId: null,
@@ -47,7 +66,17 @@ const state = {
     total_items: 0,
     total_pages: 0
   },
+  routines: [],
+  routineDetail: null,
+  routineEditingId: null,
+  routinePagination: {
+    page: 1,
+    page_size: 20,
+    total_items: 0,
+    total_pages: 0
+  },
   selectedActivityId: null,
+  selectedRoutineId: null,
   selectedTaskId: null,
   serverTime: null,
   taskEditingId: null,
@@ -100,6 +129,20 @@ const elements = {
   passwordForm: document.querySelector("[data-password-form]"),
   passwordMessage: document.querySelector("[data-password-message]"),
   passwordSubmit: document.querySelector("[data-password-submit]"),
+  routineDetail: document.querySelector("[data-routine-detail]"),
+  routineFiltersForm: document.querySelector("[data-routine-filters]"),
+  routineForm: document.querySelector("[data-routine-form]"),
+  routineFormMessage: document.querySelector("[data-routine-form-message]"),
+  routineFormTitle: document.querySelector("[data-routine-form-title]"),
+  routineList: document.querySelector("[data-routine-list]"),
+  routineListMessage: document.querySelector("[data-routine-list-message]"),
+  routinePaginationLabel: document.querySelector("[data-routine-pagination-label]"),
+  routinePageNext: document.querySelector("[data-routine-page-next]"),
+  routinePagePrevious: document.querySelector("[data-routine-page-previous]"),
+  routineReset: document.querySelector("[data-routine-reset]"),
+  routineSubmit: document.querySelector("[data-routine-submit]"),
+  routineSummary: document.querySelector("[data-routine-summary]"),
+  routineWarningList: document.querySelector("[data-routine-warning-list]"),
   serverTime: document.querySelector("[data-server-time]"),
   sessionSummary: document.querySelector("[data-session-summary]"),
   statAlert: Array.from(document.querySelectorAll("[data-stat-alert]")),
@@ -148,7 +191,7 @@ function clearWarnings(target) {
   }
 }
 
-function renderWarnings(target, warnings) {
+function renderWarnings(target, warnings, heading = "Data berhasil disimpan dengan peringatan") {
   if (!target) {
     return;
   }
@@ -158,7 +201,7 @@ function renderWarnings(target, warnings) {
     const item = document.createElement("div");
     item.className = "warning-card";
     item.innerHTML = `
-      <strong>Aktivitas berhasil disimpan dengan peringatan</strong>
+      <strong>${escapeHtml(heading)}</strong>
       <p>${escapeHtml(warning.message)}</p>
       <p class="subtle">${escapeHtml((warning.entity_type || "").toUpperCase())} #${escapeHtml(String(warning.entity_id || "-"))} · ${escapeHtml(warning.start_time || "-")} - ${escapeHtml(warning.end_time || "-")}</p>
     `;
@@ -259,9 +302,21 @@ function getErrorMessage(payload, fallback) {
   return fallback;
 }
 
+function formatWeekdays(days) {
+  if (!Array.isArray(days) || days.length === 0) {
+    return "-";
+  }
+
+  return days.map((day) => WEEKDAY_LABELS[day] || String(day)).join(", ");
+}
+
 function getCurrentPath() {
   if (window.location.pathname === ACTIVITY_PAGE) {
     return ACTIVITY_PAGE;
+  }
+
+  if (window.location.pathname === ROUTINE_PAGE) {
+    return ROUTINE_PAGE;
   }
 
   if (window.location.pathname === SECURITY_PAGE) {
@@ -280,27 +335,33 @@ function setServerTime(serverTime) {
   }
 }
 
+function pathForTarget(target) {
+  if (target === "activities") {
+    return ACTIVITY_PAGE;
+  }
+
+  if (target === "routines") {
+    return ROUTINE_PAGE;
+  }
+
+  if (target === "security") {
+    return SECURITY_PAGE;
+  }
+
+  return TASK_PAGE;
+}
+
 function setActiveNav() {
   const currentPath = getCurrentPath();
   for (const link of elements.navLinks) {
-    let target = TASK_PAGE;
-    if (link.dataset.navTarget === "activities") {
-      target = ACTIVITY_PAGE;
-    }
-    if (link.dataset.navTarget === "security") {
-      target = SECURITY_PAGE;
-    }
-    link.classList.toggle("is-active", currentPath === target);
+    link.classList.toggle("is-active", currentPath === pathForTarget(link.dataset.navTarget));
   }
 }
 
 function setPageVisibility() {
   const currentPath = getCurrentPath();
   for (const section of elements.pageModules) {
-    const sectionPath = section.dataset.pageSection === "activities"
-      ? ACTIVITY_PAGE
-      : TASK_PAGE;
-    section.hidden = currentPath !== sectionPath;
+    section.hidden = currentPath !== pathForTarget(section.dataset.pageSection);
   }
 }
 
@@ -323,6 +384,25 @@ function setPageCopy() {
     elements.metricCard4Label.textContent = "Menunggu konfirmasi";
     elements.metricCard4Desc.textContent = "Aktivitas yang sudah lewat waktu dan perlu konfirmasi.";
     elements.kpiSelectedLabel.textContent = "Aktivitas terpilih";
+    return;
+  }
+
+  if (currentPath === ROUTINE_PAGE) {
+    elements.pageEyebrow.textContent = "Routine Workspace";
+    elements.pageTitle.textContent = "Routine Operations";
+    elements.heroEyebrow.textContent = "Recurring Routine Dashboard";
+    elements.heroDescription.textContent = "Kelola template rutinitas, hari aktif, benturan jadwal, serta histori penyelesaian harian dari satu workspace yang responsif.";
+    elements.metricTotalLabel.textContent = "Total rutinitas";
+    elements.metricAlertLabel.textContent = "Nonaktif";
+    elements.metricCard1Label.textContent = "Semua rutinitas";
+    elements.metricCard1Desc.textContent = "Jumlah template rutinitas pada hasil filter saat ini.";
+    elements.metricCard2Label.textContent = "Aktif";
+    elements.metricCard2Desc.textContent = "Template rutinitas yang aktif menghasilkan histori baru.";
+    elements.metricCard3Label.textContent = "Selesai";
+    elements.metricCard3Desc.textContent = "Histori selesai pada rutinitas yang sedang dipilih.";
+    elements.metricCard4Label.textContent = "Nonaktif";
+    elements.metricCard4Desc.textContent = "Rutinitas yang saat ini dinonaktifkan.";
+    elements.kpiSelectedLabel.textContent = "Rutinitas terpilih";
     return;
   }
 
@@ -357,6 +437,23 @@ function updateOverviewMetrics() {
     setText(elements.statSecondary1, String(completed));
     setText(elements.statSecondary2, String(scheduled));
     setText(elements.statAlert, String(pending));
+    setText(elements.statSelected, String(selected));
+    return;
+  }
+
+  if (currentPath === ROUTINE_PAGE) {
+    const active = state.routines.filter((routine) => routine.is_active).length;
+    const inactive = state.routines.filter((routine) => !routine.is_active).length;
+    const completed = state.routineDetail && Array.isArray(state.routineDetail.history)
+      ? state.routineDetail.history.filter((item) => item.status === "completed").length
+      : 0;
+    const selected = state.selectedRoutineId ? 1 : 0;
+    const total = state.routinePagination.total_items || state.routines.length;
+
+    setText(elements.statTotal, String(total));
+    setText(elements.statSecondary1, String(active));
+    setText(elements.statSecondary2, String(completed));
+    setText(elements.statAlert, String(inactive));
     setText(elements.statSelected, String(selected));
     return;
   }
@@ -496,9 +593,7 @@ function renderTaskList() {
 
 function updateTaskPaginationUi() {
   const { page, page_size: pageSize, total_items: totalItems, total_pages: totalPages } = state.taskPagination;
-  elements.taskPaginationLabel.textContent = totalPages
-    ? `Halaman ${page} dari ${totalPages}`
-    : "Tidak ada halaman";
+  elements.taskPaginationLabel.textContent = totalPages ? `Halaman ${page} dari ${totalPages}` : "Tidak ada halaman";
   elements.taskPagePrevious.disabled = page <= 1;
   elements.taskPageNext.disabled = totalPages === 0 || page >= totalPages;
   elements.taskSummary.textContent = totalItems
@@ -779,9 +874,7 @@ function renderActivityList() {
 
 function updateActivityPaginationUi() {
   const { page, page_size: pageSize, total_items: totalItems, total_pages: totalPages } = state.activityPagination;
-  elements.activityPaginationLabel.textContent = totalPages
-    ? `Halaman ${page} dari ${totalPages}`
-    : "Tidak ada halaman";
+  elements.activityPaginationLabel.textContent = totalPages ? `Halaman ${page} dari ${totalPages}` : "Tidak ada halaman";
   elements.activityPagePrevious.disabled = page <= 1;
   elements.activityPageNext.disabled = totalPages === 0 || page >= totalPages;
   elements.activitySummary.textContent = totalItems
@@ -869,7 +962,7 @@ async function submitActivityForm(event) {
     resetActivityForm();
     setMessage(elements.activityFormMessage, activityId ? "Aktivitas berhasil diperbarui." : "Aktivitas berhasil dibuat.", "success");
     if (payload.warnings && payload.warnings.length > 0) {
-      renderWarnings(elements.activityWarningList, payload.warnings);
+      renderWarnings(elements.activityWarningList, payload.warnings, "Aktivitas berhasil disimpan dengan peringatan");
     }
     await loadActivities(activityId ? state.activityPagination.page : 1);
     state.selectedActivityId = activity.id;
@@ -936,6 +1029,359 @@ async function loadActivityDetail(activityId) {
 
   state.selectedActivityId = payload.data.id;
   renderActivityDetail(payload.data);
+}
+
+function resetRoutineForm() {
+  state.routineEditingId = null;
+  elements.routineForm.reset();
+  elements.routineForm.elements.priority.value = "medium";
+  elements.routineForm.elements.is_active.value = "true";
+  elements.routineForm.elements.routine_id.value = "";
+  elements.routineFormTitle.textContent = "Buat rutinitas baru";
+  elements.routineSubmit.textContent = "Simpan rutinitas";
+  setMessage(elements.routineFormMessage, "", "");
+  clearWarnings(elements.routineWarningList);
+}
+
+function getRoutineById(routineId) {
+  return state.routines.find((routine) => routine.id === routineId) || null;
+}
+
+function renderRoutineHistoryItems(history) {
+  if (!Array.isArray(history) || history.length === 0) {
+    return '<div class="empty-copy">Belum ada riwayat untuk rutinitas ini.</div>';
+  }
+
+  return history.slice(0, 12).map((item) => {
+    const canConfirm = item.status === "missed_pending";
+    return `
+      <article class="history-card">
+        <div class="history-card-head">
+          <div>
+            <strong>${escapeHtml(formatLocalDate(item.scheduled_date))}</strong>
+            <p class="subtle">${escapeHtml(item.scheduled_start)} - ${escapeHtml(item.scheduled_end)}</p>
+          </div>
+          <span class="badge ${item.status === "missed" ? "badge-overdue" : "badge-status"}">${escapeHtml(ROUTINE_HISTORY_STATUS_LABELS[item.status] || item.status)}</span>
+        </div>
+        <p class="subtle">${escapeHtml(item.notes || item.routine_title_snapshot || "Tanpa catatan tambahan")}</p>
+        <p class="subtle">Konfirmasi: ${escapeHtml(formatDateTime(item.confirmed_at))}</p>
+        ${canConfirm ? `
+          <div class="button-row button-row-compact">
+            <button class="secondary-button" type="button" data-routine-history-complete="${escapeHtml(String(item.id))}" data-routine-history-date="${escapeHtml(item.scheduled_date)}">Selesai</button>
+            <button class="secondary-button" type="button" data-routine-history-cancel="${escapeHtml(String(item.id))}" data-routine-history-date="${escapeHtml(item.scheduled_date)}">Dibatalkan</button>
+          </div>
+        ` : ""}
+      </article>
+    `;
+  }).join("");
+}
+
+function renderRoutineDetail(routine) {
+  if (!routine) {
+    elements.routineDetail.innerHTML = '<div class="empty-copy">Pilih rutinitas dari daftar untuk melihat detail dan histori.</div>';
+    updateOverviewMetrics();
+    return;
+  }
+
+  const latestHistory = Array.isArray(routine.upcoming_history) && routine.upcoming_history.length > 0
+    ? routine.upcoming_history[0]
+    : null;
+
+  elements.routineDetail.innerHTML = `
+    <div class="detail-stack">
+      <div>
+        <p class="panel-label">Routine #${routine.id}</p>
+        <h4>${escapeHtml(routine.title)}</h4>
+        <p class="subtle">${escapeHtml(routine.notes || "Tidak ada catatan.")}</p>
+      </div>
+      <div class="task-badges">
+        <span class="badge badge-priority">${escapeHtml(PRIORITY_LABELS[routine.priority] || routine.priority)}</span>
+        <span class="badge ${routine.is_active ? "badge-status" : "badge-overdue"}">${routine.is_active ? "Aktif" : "Nonaktif"}</span>
+        ${latestHistory ? `<span class="badge badge-status">Berikutnya ${escapeHtml(formatLocalDate(latestHistory.scheduled_date))}</span>` : ""}
+      </div>
+      <div class="detail-grid">
+        <div><strong>Hari aktif</strong><span>${escapeHtml(formatWeekdays(routine.day_of_week))}</span></div>
+        <div><strong>Jam</strong><span>${escapeHtml(routine.start_time)} - ${escapeHtml(routine.end_time)}</span></div>
+        <div><strong>Prioritas</strong><span>${escapeHtml(PRIORITY_LABELS[routine.priority] || routine.priority)}</span></div>
+        <div><strong>Status</strong><span>${routine.is_active ? "Aktif" : "Nonaktif"}</span></div>
+        <div><strong>Dibuat</strong><span>${escapeHtml(formatDateTime(routine.created_at))}</span></div>
+        <div><strong>Sinkronisasi</strong><span>${escapeHtml(formatDateTime(routine.updated_at))}</span></div>
+      </div>
+      <div class="button-row status-action-row">
+        <button class="secondary-button" type="button" data-routine-detail-edit="${routine.id}">Edit</button>
+        <button class="secondary-button" type="button" data-routine-detail-toggle="${routine.id}" data-routine-detail-active="${routine.is_active ? "true" : "false"}">${routine.is_active ? "Nonaktifkan" : "Aktifkan"}</button>
+        <button class="danger-button" type="button" data-routine-detail-delete="${routine.id}">Hapus</button>
+      </div>
+      <div>
+        <p class="panel-label">Riwayat Rutinitas</p>
+        <div class="history-list">${renderRoutineHistoryItems(routine.history)}</div>
+      </div>
+    </div>
+  `;
+  updateOverviewMetrics();
+}
+
+function fillRoutineForm(routine) {
+  state.routineEditingId = routine.id;
+  elements.routineForm.elements.routine_id.value = String(routine.id);
+  elements.routineForm.elements.title.value = routine.title || "";
+  elements.routineForm.elements.priority.value = routine.priority || "medium";
+  elements.routineForm.elements.is_active.value = routine.is_active ? "true" : "false";
+  elements.routineForm.elements.start_time.value = routine.start_time || "";
+  elements.routineForm.elements.end_time.value = routine.end_time || "";
+  elements.routineForm.elements.notes.value = routine.notes || "";
+  for (const checkbox of elements.routineForm.querySelectorAll("input[name=\"day_of_week\"]")) {
+    checkbox.checked = Array.isArray(routine.day_of_week) && routine.day_of_week.includes(Number(checkbox.value));
+  }
+  elements.routineFormTitle.textContent = `Edit rutinitas #${routine.id}`;
+  elements.routineSubmit.textContent = "Update rutinitas";
+  setMessage(elements.routineFormMessage, "Mode edit aktif.", "success");
+  clearWarnings(elements.routineWarningList);
+  document.getElementById("routine-editor").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderRoutineList() {
+  const routines = state.routines;
+  elements.routineList.innerHTML = "";
+
+  if (!routines.length) {
+    elements.routineList.innerHTML = '<div class="empty-copy">Belum ada rutinitas yang cocok dengan filter saat ini.</div>';
+    renderRoutineDetail(null);
+    return;
+  }
+
+  for (const routine of routines) {
+    const item = document.createElement("article");
+    item.className = "task-card";
+    item.innerHTML = `
+      <div class="task-card-main">
+        <div class="task-card-heading">
+          <div>
+            <p class="panel-label">Routine #${routine.id}</p>
+            <h4>${escapeHtml(routine.title)}</h4>
+            <p class="subtle">${escapeHtml(routine.notes || "Tanpa catatan")}</p>
+          </div>
+          <div class="task-badges">
+            <span class="badge badge-priority">${escapeHtml(PRIORITY_LABELS[routine.priority] || routine.priority)}</span>
+            <span class="badge ${routine.is_active ? "badge-status" : "badge-overdue"}">${routine.is_active ? "Aktif" : "Nonaktif"}</span>
+          </div>
+        </div>
+        <div class="task-meta-grid">
+          <span><strong>Hari</strong> ${escapeHtml(formatWeekdays(routine.day_of_week))}</span>
+          <span><strong>Jam</strong> ${escapeHtml(routine.start_time)} - ${escapeHtml(routine.end_time)}</span>
+          <span><strong>Sinkronisasi</strong> ${escapeHtml(formatDateTime(routine.updated_at))}</span>
+        </div>
+      </div>
+      <div class="task-card-actions">
+        <div class="button-row button-row-compact">
+          <button class="secondary-button" type="button" data-routine-view="${routine.id}">Detail</button>
+          <button class="secondary-button" type="button" data-routine-edit="${routine.id}">Edit</button>
+          <button class="secondary-button" type="button" data-routine-toggle="${routine.id}" data-routine-active="${routine.is_active ? "true" : "false"}">${routine.is_active ? "Nonaktifkan" : "Aktifkan"}</button>
+          <button class="danger-button" type="button" data-routine-delete="${routine.id}">Hapus</button>
+        </div>
+      </div>
+    `;
+    elements.routineList.appendChild(item);
+  }
+}
+
+function updateRoutinePaginationUi() {
+  const { page, page_size: pageSize, total_items: totalItems, total_pages: totalPages } = state.routinePagination;
+  elements.routinePaginationLabel.textContent = totalPages ? `Halaman ${page} dari ${totalPages}` : "Tidak ada halaman";
+  elements.routinePagePrevious.disabled = page <= 1;
+  elements.routinePageNext.disabled = totalPages === 0 || page >= totalPages;
+  elements.routineSummary.textContent = totalItems
+    ? `${totalItems} rutinitas ditemukan, menampilkan hingga ${pageSize} per halaman.`
+    : "Belum ada data rutinitas untuk ditampilkan.";
+  updateOverviewMetrics();
+}
+
+function buildRoutineListQuery(page = state.routinePagination.page) {
+  const params = new URLSearchParams();
+  const formData = new FormData(elements.routineFiltersForm);
+  params.set("page", String(page));
+
+  for (const [key, rawValue] of formData.entries()) {
+    const value = String(rawValue).trim();
+    if (value) {
+      params.set(key, value);
+    }
+  }
+
+  return params;
+}
+
+async function loadRoutineDetail(routineId) {
+  const { response, payload } = await requestJson(`/api/routines/${routineId}`);
+  setServerTime(payload && payload.meta ? payload.meta.server_time : null);
+
+  if (!response.ok) {
+    setMessage(elements.routineListMessage, getErrorMessage(payload, "Gagal memuat detail rutinitas."), "error");
+    return;
+  }
+
+  state.selectedRoutineId = payload.data.id;
+  state.routineDetail = payload.data;
+  renderRoutineDetail(payload.data);
+}
+
+async function loadRoutines(page = 1) {
+  state.routinePagination.page = page;
+  setMessage(elements.routineListMessage, "Memuat daftar rutinitas…", "");
+
+  const params = buildRoutineListQuery(page);
+  const { response, payload } = await requestJson(`/api/routines?${params.toString()}`);
+  setServerTime(payload && payload.meta ? payload.meta.server_time : null);
+
+  if (!response.ok) {
+    setMessage(elements.routineListMessage, getErrorMessage(payload, "Gagal memuat daftar rutinitas."), "error");
+    return;
+  }
+
+  state.routines = payload.data.items;
+  state.routinePagination = payload.meta.pagination;
+  renderRoutineList();
+  updateRoutinePaginationUi();
+  setMessage(elements.routineListMessage, "", "");
+
+  const activeRoutine = getRoutineById(state.selectedRoutineId) || state.routines[0] || null;
+  state.selectedRoutineId = activeRoutine ? activeRoutine.id : null;
+  if (activeRoutine) {
+    await loadRoutineDetail(activeRoutine.id);
+  } else {
+    state.routineDetail = null;
+    renderRoutineDetail(null);
+  }
+}
+
+function collectRoutinePayload() {
+  const days = Array.from(elements.routineForm.querySelectorAll("input[name=\"day_of_week\"]:checked"))
+    .map((input) => Number(input.value));
+
+  return {
+    title: elements.routineForm.elements.title.value,
+    day_of_week: days,
+    start_time: elements.routineForm.elements.start_time.value,
+    end_time: elements.routineForm.elements.end_time.value,
+    priority: elements.routineForm.elements.priority.value,
+    notes: elements.routineForm.elements.notes.value,
+    is_active: elements.routineForm.elements.is_active.value === "true"
+  };
+}
+
+async function submitRoutineForm(event) {
+  event.preventDefault();
+  clearWarnings(elements.routineWarningList);
+  setMessage(elements.routineFormMessage, "Menyimpan rutinitas…", "");
+  elements.routineSubmit.disabled = true;
+
+  try {
+    const routineId = state.routineEditingId;
+    const method = routineId ? "PUT" : "POST";
+    const path = routineId ? `/api/routines/${routineId}` : "/api/routines";
+    const { response, payload } = await requestJson(path, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(collectRoutinePayload())
+    });
+
+    setServerTime(payload && payload.meta ? payload.meta.server_time : null);
+
+    if (!response.ok) {
+      setMessage(elements.routineFormMessage, getErrorMessage(payload, "Gagal menyimpan rutinitas."), "error");
+      return;
+    }
+
+    const routine = payload.data;
+    state.selectedRoutineId = routine.id;
+    resetRoutineForm();
+    setMessage(elements.routineFormMessage, routineId ? "Rutinitas berhasil diperbarui." : "Rutinitas berhasil dibuat.", "success");
+    if (payload.warnings && payload.warnings.length > 0) {
+      renderWarnings(elements.routineWarningList, payload.warnings, "Rutinitas berhasil disimpan dengan peringatan");
+    }
+    await loadRoutines(routineId ? state.routinePagination.page : 1);
+    state.selectedRoutineId = routine.id;
+    await loadRoutineDetail(routine.id);
+  } finally {
+    elements.routineSubmit.disabled = false;
+  }
+}
+
+async function deleteRoutine(routineId) {
+  const confirmed = window.confirm("Hapus template rutinitas ini? Histori yang sudah tercatat tetap dipertahankan.");
+  if (!confirmed) {
+    return;
+  }
+
+  const { response, payload } = await requestJson(`/api/routines/${routineId}`, { method: "DELETE" });
+  setServerTime(payload && payload.meta ? payload.meta.server_time : null);
+
+  if (!response.ok) {
+    setMessage(elements.routineListMessage, getErrorMessage(payload, "Gagal menghapus rutinitas."), "error");
+    return;
+  }
+
+  if (state.selectedRoutineId === routineId) {
+    state.selectedRoutineId = null;
+    state.routineDetail = null;
+  }
+
+  setMessage(elements.routineListMessage, "Rutinitas berhasil dihapus.", "success");
+  await loadRoutines(state.routinePagination.page);
+}
+
+async function toggleRoutine(routineId, isActive, successMessage) {
+  const nextValue = !isActive;
+  const confirmed = window.confirm(`${nextValue ? "Aktifkan" : "Nonaktifkan"} rutinitas ini?`);
+  if (!confirmed) {
+    return;
+  }
+
+  const { response, payload } = await requestJson(`/api/routines/${routineId}/toggle`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ is_active: nextValue })
+  });
+  setServerTime(payload && payload.meta ? payload.meta.server_time : null);
+
+  if (!response.ok) {
+    setMessage(elements.routineListMessage, getErrorMessage(payload, "Gagal mengubah status rutinitas."), "error");
+    await loadRoutines(state.routinePagination.page);
+    return;
+  }
+
+  state.selectedRoutineId = payload.data.id;
+  setMessage(elements.routineListMessage, successMessage || "Status rutinitas diperbarui.", "success");
+  await loadRoutines(state.routinePagination.page);
+  await loadRoutineDetail(payload.data.id);
+}
+
+async function confirmRoutineHistory(routineId, scheduledDate, status, successMessage) {
+  const confirmed = window.confirm(`Konfirmasi kemunculan rutinitas ini sebagai ${ROUTINE_HISTORY_STATUS_LABELS[status]}?`);
+  if (!confirmed) {
+    return;
+  }
+
+  const notes = window.prompt("Catatan opsional untuk riwayat ini:", "") || "";
+  const { response, payload } = await requestJson(`/api/routines/${routineId}/confirm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      scheduled_date: scheduledDate,
+      status,
+      notes
+    })
+  });
+  setServerTime(payload && payload.meta ? payload.meta.server_time : null);
+
+  if (!response.ok) {
+    setMessage(elements.routineListMessage, getErrorMessage(payload, "Gagal mengonfirmasi riwayat rutinitas."), "error");
+    await loadRoutineDetail(routineId);
+    return;
+  }
+
+  setMessage(elements.routineListMessage, successMessage, "success");
+  await loadRoutineDetail(routineId);
 }
 
 async function submitPasswordForm(event) {
@@ -1083,6 +1529,84 @@ function handleActivityDetailClick(event) {
   }
 }
 
+function handleRoutineListClick(event) {
+  const target = event.target.closest("button");
+  if (!target) {
+    return;
+  }
+
+  if (target.matches("[data-routine-view]")) {
+    loadRoutineDetail(Number(target.dataset.routineView));
+    return;
+  }
+
+  if (target.matches("[data-routine-edit]")) {
+    const routine = getRoutineById(Number(target.dataset.routineEdit));
+    if (routine) {
+      fillRoutineForm(routine);
+    }
+    return;
+  }
+
+  if (target.matches("[data-routine-toggle]")) {
+    toggleRoutine(
+      Number(target.dataset.routineToggle),
+      target.dataset.routineActive === "true",
+      "Status rutinitas diperbarui."
+    );
+    return;
+  }
+
+  if (target.matches("[data-routine-delete]")) {
+    deleteRoutine(Number(target.dataset.routineDelete));
+  }
+}
+
+function handleRoutineDetailClick(event) {
+  const target = event.target.closest("button");
+  if (!target || !state.routineDetail) {
+    return;
+  }
+
+  if (target.matches("[data-routine-detail-edit]")) {
+    fillRoutineForm(state.routineDetail);
+    return;
+  }
+
+  if (target.matches("[data-routine-detail-toggle]")) {
+    toggleRoutine(
+      Number(target.dataset.routineDetailToggle),
+      target.dataset.routineDetailActive === "true",
+      "Status rutinitas diperbarui."
+    );
+    return;
+  }
+
+  if (target.matches("[data-routine-detail-delete]")) {
+    deleteRoutine(Number(target.dataset.routineDetailDelete));
+    return;
+  }
+
+  if (target.matches("[data-routine-history-complete]")) {
+    confirmRoutineHistory(
+      state.routineDetail.id,
+      target.dataset.routineHistoryDate,
+      "completed",
+      "Riwayat rutinitas ditandai selesai."
+    );
+    return;
+  }
+
+  if (target.matches("[data-routine-history-cancel]")) {
+    confirmRoutineHistory(
+      state.routineDetail.id,
+      target.dataset.routineHistoryDate,
+      "cancelled",
+      "Riwayat rutinitas dibatalkan."
+    );
+  }
+}
+
 function bindEvents() {
   elements.taskForm.addEventListener("submit", submitTaskForm);
   elements.taskReset.addEventListener("click", resetTaskForm);
@@ -1136,6 +1660,32 @@ function bindEvents() {
   elements.activityList.addEventListener("click", handleActivityListClick);
   elements.activityDetail.addEventListener("click", handleActivityDetailClick);
 
+  elements.routineForm.addEventListener("submit", submitRoutineForm);
+  elements.routineReset.addEventListener("click", resetRoutineForm);
+  elements.routineFiltersForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await loadRoutines(1);
+  });
+  document.querySelector("[data-routine-clear-filters]").addEventListener("click", async () => {
+    elements.routineFiltersForm.reset();
+    elements.routineFiltersForm.elements.sort.value = "created_at";
+    elements.routineFiltersForm.elements.order.value = "desc";
+    elements.routineFiltersForm.elements.page_size.value = "20";
+    await loadRoutines(1);
+  });
+  elements.routinePagePrevious.addEventListener("click", async () => {
+    if (state.routinePagination.page > 1) {
+      await loadRoutines(state.routinePagination.page - 1);
+    }
+  });
+  elements.routinePageNext.addEventListener("click", async () => {
+    if (state.routinePagination.page < state.routinePagination.total_pages) {
+      await loadRoutines(state.routinePagination.page + 1);
+    }
+  });
+  elements.routineList.addEventListener("click", handleRoutineListClick);
+  elements.routineDetail.addEventListener("click", handleRoutineDetailClick);
+
   elements.passwordForm.addEventListener("submit", submitPasswordForm);
 
   for (const button of elements.logoutButtons) {
@@ -1182,6 +1732,7 @@ async function boot() {
     setPageCopy();
     resetTaskForm();
     resetActivityForm();
+    resetRoutineForm();
     updateOverviewMetrics();
     const sessionData = await loadSession();
     if (!sessionData) {
@@ -1192,6 +1743,8 @@ async function boot() {
 
     if (getCurrentPath() === ACTIVITY_PAGE) {
       await loadActivities(1);
+    } else if (getCurrentPath() === ROUTINE_PAGE) {
+      await loadRoutines(1);
     } else {
       await loadTasks(1);
     }
@@ -1200,7 +1753,12 @@ async function boot() {
       document.getElementById("security").scrollIntoView({ behavior: "smooth", block: "start" });
     }
   } catch (error) {
-    setMessage(getCurrentPath() === ACTIVITY_PAGE ? elements.activityListMessage : elements.taskListMessage, error.message || "Terjadi kesalahan saat memuat aplikasi.", "error");
+    const target = getCurrentPath() === ACTIVITY_PAGE
+      ? elements.activityListMessage
+      : getCurrentPath() === ROUTINE_PAGE
+        ? elements.routineListMessage
+        : elements.taskListMessage;
+    setMessage(target, error.message || "Terjadi kesalahan saat memuat aplikasi.", "error");
   }
 }
 

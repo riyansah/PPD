@@ -77,7 +77,7 @@ function request(server, { method = "GET", path: route = "/", body, headers = {}
 }
 
 async function createHarness(options = {}) {
-  const { nowProvider, ...envOverrides } = options;
+  const { nowProvider, startScheduler = false, schedulerIntervalMs, ...envOverrides } = options;
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ppd-auth-"));
   const databasePath = path.join(tempDir, "app.sqlite");
   const env = createEnv({
@@ -101,15 +101,21 @@ async function createHarness(options = {}) {
     sessionRepository: createSessionRepository(db),
     loginRateLimitRepository: createLoginRateLimitRepository(db)
   });
-  const app = createApp({ env, db, logger, nowProvider });
+  const app = createApp({ env, db, logger, nowProvider, startScheduler, schedulerIntervalMs });
   const server = app.listen(0);
 
   return {
+    app,
     authService,
     db,
     env,
+    routineScheduler: app.locals.jobs ? app.locals.jobs.routineReconciliation : null,
+    routineService: app.locals.services ? app.locals.services.routineService : null,
     server,
     async close() {
+      if (app.locals.jobs && app.locals.jobs.routineReconciliation) {
+        app.locals.jobs.routineReconciliation.stop();
+      }
       await new Promise((resolve) => server.close(resolve));
       db.close();
     }

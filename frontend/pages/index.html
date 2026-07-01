@@ -29,6 +29,10 @@
               <span class="nav-icon" aria-hidden="true">◫</span>
               <span>Aktivitas</span>
             </a>
+            <a href="/routines" class="nav-link" data-nav-target="routines">
+              <span class="nav-icon" aria-hidden="true">◪</span>
+              <span>Rutinitas</span>
+            </a>
             <a href="/security" class="nav-link" data-nav-target="security">
               <span class="nav-icon" aria-hidden="true">◌</span>
               <span>Keamanan</span>
@@ -63,6 +67,7 @@
         <nav class="mobile-menu mobile-menu-modern" id="mobile-menu" hidden aria-label="Mobile">
           <a href="/tasks" class="nav-link" data-nav-target="tasks">Pekerjaan</a>
           <a href="/activities" class="nav-link" data-nav-target="activities">Aktivitas</a>
+          <a href="/routines" class="nav-link" data-nav-target="routines">Rutinitas</a>
           <a href="/security" class="nav-link" data-nav-target="security">Keamanan</a>
           <button type="button" class="nav-link nav-button" data-logout-button>Logout</button>
         </nav>
@@ -330,6 +335,101 @@
                 </div>
               </section>
             </section>
+
+            <section class="page-module" data-page-section="routines">
+              <section class="panel panel-modern filter-panel">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Filter dan Pencarian</p>
+                    <h3>Routine Explorer</h3>
+                  </div>
+                  <p class="subtle">Telusuri template rutinitas, hari aktif, status aktif, dan histori pelaksanaannya.</p>
+                </div>
+                <form class="filter-grid" data-routine-filters>
+                  <label class="field">
+                    <span>Cari</span>
+                    <input name="search" type="search" placeholder="Cari judul atau catatan">
+                  </label>
+                  <label class="field">
+                    <span>Status</span>
+                    <select name="is_active">
+                      <option value="">Semua</option>
+                      <option value="true">Aktif</option>
+                      <option value="false">Nonaktif</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Prioritas</span>
+                    <select name="priority">
+                      <option value="">Semua prioritas</option>
+                      <option value="low">Rendah</option>
+                      <option value="medium">Sedang</option>
+                      <option value="high">Tinggi</option>
+                      <option value="urgent">Mendesak</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Hari aktif</span>
+                    <select name="day_of_week">
+                      <option value="">Semua hari</option>
+                      <option value="1">Senin</option>
+                      <option value="2">Selasa</option>
+                      <option value="3">Rabu</option>
+                      <option value="4">Kamis</option>
+                      <option value="5">Jumat</option>
+                      <option value="6">Sabtu</option>
+                      <option value="7">Minggu</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Urutkan</span>
+                    <select name="sort">
+                      <option value="created_at">Dibuat</option>
+                      <option value="start_time">Jam mulai</option>
+                      <option value="end_time">Jam selesai</option>
+                      <option value="priority">Prioritas</option>
+                      <option value="title">Judul</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Arah</span>
+                    <select name="order">
+                      <option value="desc">Turun</option>
+                      <option value="asc">Naik</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Per halaman</span>
+                    <select name="page_size">
+                      <option value="20">20</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                  </label>
+                  <div class="filter-actions">
+                    <button class="primary-button" type="submit">Terapkan</button>
+                    <button class="secondary-button" type="button" data-routine-clear-filters>Bersihkan</button>
+                  </div>
+                </form>
+              </section>
+
+              <section class="panel panel-modern list-panel">
+                <div class="section-heading section-heading-modern list-header">
+                  <div>
+                    <p class="panel-label">Daftar Rutinitas</p>
+                    <h3>Recurring Schedule</h3>
+                  </div>
+                  <p class="subtle" data-routine-summary>Memuat daftar rutinitas…</p>
+                </div>
+                <p class="form-message" data-routine-list-message aria-live="polite"></p>
+                <div class="task-list" data-routine-list></div>
+                <div class="pagination-row">
+                  <button class="secondary-button" type="button" data-routine-page-previous>Sebelumnya</button>
+                  <span class="subtle pagination-pill" data-routine-pagination-label>Halaman 1</span>
+                  <button class="secondary-button" type="button" data-routine-page-next>Berikutnya</button>
+                </div>
+              </section>
+            </section>
           </div>
 
           <aside class="workspace-side">
@@ -473,6 +573,86 @@
                   <span class="panel-chip panel-chip-soft">Live Detail</span>
                 </div>
                 <div data-activity-detail class="empty-copy">Pilih aktivitas dari daftar untuk melihat detail lengkap.</div>
+              </article>
+            </section>
+
+            <section class="page-module" data-page-section="routines">
+              <article class="panel panel-modern panel-emphasis" id="routine-editor">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Template Rutinitas</p>
+                    <h3 data-routine-form-title>Buat rutinitas baru</h3>
+                  </div>
+                  <span class="panel-chip">Create / Edit</span>
+                </div>
+                <form class="auth-form compact-form" data-routine-form novalidate>
+                  <input type="hidden" name="routine_id" value="">
+                  <label class="field">
+                    <span>Judul</span>
+                    <input name="title" type="text" required>
+                  </label>
+                  <div class="split-fields split-fields-modern">
+                    <label class="field">
+                      <span>Prioritas</span>
+                      <select name="priority">
+                        <option value="low">Rendah</option>
+                        <option value="medium" selected>Sedang</option>
+                        <option value="high">Tinggi</option>
+                        <option value="urgent">Mendesak</option>
+                      </select>
+                    </label>
+                    <label class="field">
+                      <span>Status template</span>
+                      <select name="is_active">
+                        <option value="true">Aktif</option>
+                        <option value="false">Nonaktif</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="split-fields split-fields-modern">
+                    <label class="field">
+                      <span>Jam mulai</span>
+                      <input name="start_time" type="time" required>
+                    </label>
+                    <label class="field">
+                      <span>Jam selesai</span>
+                      <input name="end_time" type="time" required>
+                    </label>
+                  </div>
+                  <fieldset class="field weekday-group">
+                    <legend>Hari aktif</legend>
+                    <div class="weekday-grid">
+                      <label class="weekday-option"><input type="checkbox" name="day_of_week" value="1"> <span>Sen</span></label>
+                      <label class="weekday-option"><input type="checkbox" name="day_of_week" value="2"> <span>Sel</span></label>
+                      <label class="weekday-option"><input type="checkbox" name="day_of_week" value="3"> <span>Rab</span></label>
+                      <label class="weekday-option"><input type="checkbox" name="day_of_week" value="4"> <span>Kam</span></label>
+                      <label class="weekday-option"><input type="checkbox" name="day_of_week" value="5"> <span>Jum</span></label>
+                      <label class="weekday-option"><input type="checkbox" name="day_of_week" value="6"> <span>Sab</span></label>
+                      <label class="weekday-option"><input type="checkbox" name="day_of_week" value="7"> <span>Min</span></label>
+                    </div>
+                  </fieldset>
+                  <label class="field">
+                    <span>Catatan</span>
+                    <textarea name="notes" rows="4"></textarea>
+                  </label>
+                  <p class="form-message" data-routine-form-message aria-live="polite"></p>
+                  <div class="warning-stack" data-routine-warning-list></div>
+                  <div class="button-row">
+                    <button class="primary-button" type="submit" data-routine-submit>Simpan rutinitas</button>
+                    <button class="secondary-button" type="button" data-routine-reset>Reset</button>
+                  </div>
+                </form>
+              </article>
+
+              <article class="panel panel-modern" id="routine-detail-panel">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Detail dan Riwayat</p>
+                    <h3>Routine Inspector</h3>
+                  </div>
+                  <span class="panel-chip panel-chip-soft">Live Detail</span>
+                </div>
+                <div data-routine-detail class="empty-copy">Pilih rutinitas dari daftar untuk melihat detail dan histori.</div>
               </article>
             </section>
 

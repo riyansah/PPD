@@ -108,23 +108,23 @@ Acceptance:
 
 ## Fase 5. Modul Rutinitas dan Riwayat
 
-- [ ] Buat tabel/query rutinitas, hari aktif, dan riwayat.
-- [ ] Implementasi endpoint daftar, detail, create, update, delete.
-- [ ] Implementasi endpoint toggle aktif/nonaktif.
-- [ ] Implementasi endpoint konfirmasi rutinitas.
-- [ ] Tambahkan validasi jam dan hari aktif.
-- [ ] Tambahkan deteksi benturan rutinitas-rutinitas.
-- [ ] Tambahkan deteksi benturan rutinitas-aktivitas.
-- [ ] Implementasi generator kemunculan riwayat rutinitas.
-- [ ] Implementasi auto-mark rutinitas terlewat.
-- [ ] Pastikan snapshot judul/jadwal tersimpan di riwayat.
-- [ ] Bangun UI daftar, form, detail, dan riwayat rutinitas.
+- [x] Buat tabel/query rutinitas, hari aktif, dan riwayat.
+- [x] Implementasi endpoint daftar, detail, create, update, delete.
+- [x] Implementasi endpoint toggle aktif/nonaktif.
+- [x] Implementasi endpoint konfirmasi rutinitas.
+- [x] Tambahkan validasi jam dan hari aktif.
+- [x] Tambahkan deteksi benturan rutinitas-rutinitas.
+- [x] Tambahkan deteksi benturan rutinitas-aktivitas.
+- [x] Implementasi generator kemunculan riwayat rutinitas.
+- [x] Implementasi auto-mark rutinitas terlewat.
+- [x] Pastikan snapshot judul/jadwal tersimpan di riwayat.
+- [x] Bangun UI daftar, form, detail, dan riwayat rutinitas.
 
 Acceptance:
 
-- [ ] CRUD rutinitas berjalan.
-- [ ] Riwayat rutinitas tercipta dan konsisten.
-- [ ] Rutinitas terlewat tercatat otomatis.
+- [x] CRUD rutinitas berjalan.
+- [x] Riwayat rutinitas tercipta dan konsisten.
+- [x] Rutinitas terlewat tercatat otomatis.
 
 ## Fase 6. Dashboard dan Grafik
 

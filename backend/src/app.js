@@ -15,11 +15,14 @@ const { createSessionRepository } = require("./repositories/session-repository")
 const { createLoginRateLimitRepository } = require("./repositories/login-rate-limit-repository");
 const { createTaskRepository } = require("./repositories/task-repository");
 const { createActivityRepository } = require("./repositories/activity-repository");
+const { createRoutineRepository } = require("./repositories/routine-repository");
 const { createAuthService } = require("./services/auth-service");
 const { createTaskService } = require("./services/task-service");
 const { createActivityService } = require("./services/activity-service");
+const { createRoutineService } = require("./services/routine-service");
+const { startRoutineReconciliationJob } = require("./jobs/routine-reconciliation-job");
 
-function createApp({ env, db, logger, nowProvider }) {
+function createApp({ env, db, logger, nowProvider, startScheduler = env.nodeEnv !== "test", schedulerIntervalMs }) {
   const app = express();
   const frontendRoot = path.resolve(__dirname, "..", "..", "frontend");
   const userRepository = createUserRepository(db);
@@ -27,6 +30,7 @@ function createApp({ env, db, logger, nowProvider }) {
   const loginRateLimitRepository = createLoginRateLimitRepository(db);
   const taskRepository = createTaskRepository(db);
   const activityRepository = createActivityRepository(db);
+  const routineRepository = createRoutineRepository(db);
   const authService = createAuthService({
     env,
     db,
@@ -37,6 +41,7 @@ function createApp({ env, db, logger, nowProvider }) {
   });
   const taskService = createTaskService({ taskRepository });
   const activityService = createActivityService({ activityRepository, nowProvider });
+  const routineService = createRoutineService({ routineRepository, nowProvider });
 
   app.disable("x-powered-by");
   app.use(requestContextMiddleware);
@@ -48,15 +53,32 @@ function createApp({ env, db, logger, nowProvider }) {
   app.use("/assets", express.static(path.join(frontendRoot, "assets")));
   app.use("/styles", express.static(path.join(frontendRoot, "styles")));
   app.use("/scripts", express.static(path.join(frontendRoot, "scripts")));
-  app.use("/api", createApiRouter({ env, db, authService, taskService, activityService }));
+  app.use("/api", createApiRouter({ env, db, authService, taskService, activityService, routineService }));
 
   app.get("/login", redirectAuthenticatedUser, (req, res) => {
     res.sendFile(path.join(frontendRoot, "pages", "login.html"));
   });
 
-  app.get(["/", "/tasks", "/activities", "/security"], requirePageAuth, (req, res) => {
+  app.get(["/", "/tasks", "/activities", "/routines", "/security"], requirePageAuth, (req, res) => {
     res.sendFile(path.join(frontendRoot, "pages", "index.html"));
   });
+
+  app.locals.services = {
+    authService,
+    taskService,
+    activityService,
+    routineService
+  };
+
+  app.locals.jobs = app.locals.jobs || {};
+  if (!app.locals.jobs.routineReconciliation) {
+    app.locals.jobs.routineReconciliation = startRoutineReconciliationJob({
+      routineService,
+      logger,
+      intervalMs: schedulerIntervalMs,
+      autoStart: startScheduler
+    });
+  }
 
   app.use(notFoundMiddleware);
   app.use(errorHandlerMiddleware({ logger }));

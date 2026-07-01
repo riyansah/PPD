@@ -25,6 +25,9 @@ const server = app.listen(env.port, () => {
 function shutdown(signal) {
   logger.info("server_stopping", { signal });
   server.close(() => {
+    if (app.locals.jobs && app.locals.jobs.routineReconciliation) {
+      app.locals.jobs.routineReconciliation.stop();
+    }
     db.close();
     process.exit(0);
   });

@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-01
+
+### Added
+- Added authenticated routine management with CRUD, active weekday editing, active or inactive toggling, confirmation, and soft delete.
+- Added daily routine-history reconciliation with Jakarta-local occurrence generation, idempotent duplicate prevention, and automatic missed processing.
+- Added responsive Rutinitas interfaces for list, detail, create, edit, delete, conflict warnings, and routine-history confirmation.
+- Added automated routine tests covering validation, ownership isolation, filters, sorting, pagination, scheduler stability, snapshot preservation, and confirmation rules.
+
 ## [0.5.1] - 2026-06-29
 
 ### Added
