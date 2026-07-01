@@ -37,6 +37,10 @@
               <span class="nav-icon" aria-hidden="true">◪</span>
               <span>Rutinitas</span>
             </a>
+            <a href="/reports" class="nav-link" data-nav-target="reports">
+              <span class="nav-icon" aria-hidden="true">▤</span>
+              <span>Laporan</span>
+            </a>
             <a href="/security" class="nav-link" data-nav-target="security">
               <span class="nav-icon" aria-hidden="true">◌</span>
               <span>Keamanan</span>
@@ -73,6 +77,7 @@
           <a href="/tasks" class="nav-link" data-nav-target="tasks">Pekerjaan</a>
           <a href="/activities" class="nav-link" data-nav-target="activities">Aktivitas</a>
           <a href="/routines" class="nav-link" data-nav-target="routines">Rutinitas</a>
+          <a href="/reports" class="nav-link" data-nav-target="reports">Laporan</a>
           <a href="/security" class="nav-link" data-nav-target="security">Keamanan</a>
           <button type="button" class="nav-link nav-button" data-logout-button>Logout</button>
         </nav>
@@ -165,6 +170,70 @@
                   <p class="subtle" data-dashboard-chart-range>Periode mingguan</p>
                 </div>
                 <div class="dashboard-chart-grid" data-dashboard-charts></div>
+              </section>
+            </section>
+
+            <section class="page-module" data-page-section="reports">
+              <section class="panel panel-modern filter-panel">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Filter Laporan</p>
+                    <h3>Periode Produktivitas</h3>
+                  </div>
+                  <p class="subtle">Data laporan dan ekspor selalu mengikuti filter periode yang sama.</p>
+                </div>
+                <form class="filter-grid" data-report-filters>
+                  <label class="field">
+                    <span>Periode</span>
+                    <select name="period" data-report-period>
+                      <option value="daily">Harian</option>
+                      <option value="weekly" selected>Mingguan</option>
+                      <option value="monthly">Bulanan</option>
+                      <option value="custom">Rentang tanggal</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Tanggal acuan</span>
+                    <input name="date" type="date">
+                  </label>
+                  <label class="field">
+                    <span>Tanggal mulai</span>
+                    <input name="start_date" type="date">
+                  </label>
+                  <label class="field">
+                    <span>Tanggal selesai</span>
+                    <input name="end_date" type="date">
+                  </label>
+                  <div class="filter-actions">
+                    <button class="primary-button" type="submit">Terapkan</button>
+                    <button class="secondary-button" type="button" data-report-reset>Bersihkan</button>
+                  </div>
+                </form>
+              </section>
+
+              <section class="panel panel-modern list-panel">
+                <div class="section-heading section-heading-modern list-header">
+                  <div>
+                    <p class="panel-label">Ringkasan Laporan</p>
+                    <h3>Statistik dan Insight</h3>
+                  </div>
+                  <p class="subtle" data-report-range>Memuat periode…</p>
+                </div>
+                <p class="form-message" data-report-message aria-live="polite">Memuat laporan…</p>
+                <div class="dashboard-summary-grid" data-report-summary></div>
+                <div class="report-summary-text" data-report-summary-text></div>
+                <div class="dashboard-chart-grid" data-report-charts></div>
+              </section>
+
+              <section class="panel panel-modern list-panel">
+                <div class="section-heading section-heading-modern list-header">
+                  <div>
+                    <p class="panel-label">Data Laporan</p>
+                    <h3>Tabel Periode</h3>
+                  </div>
+                  <span class="panel-chip panel-chip-soft">Sesuai ekspor</span>
+                </div>
+                <div class="report-table-stack" data-report-tables></div>
               </section>
             </section>
 
@@ -490,6 +559,26 @@
                   <span class="panel-chip">DD:HH:MM:SS</span>
                 </div>
                 <div class="task-list compact-list" data-dashboard-deadlines></div>
+              </article>
+            </section>
+
+            <section class="page-module" data-page-section="reports">
+              <article class="panel panel-modern panel-emphasis">
+                <div class="section-heading section-heading-modern">
+                  <div>
+                    <p class="panel-label">Ekspor Laporan</p>
+                    <h3>PDF dan CSV</h3>
+                  </div>
+                  <span class="panel-chip">UTF-8</span>
+                </div>
+                <p class="subtle">Unduhan menggunakan periode laporan aktif.</p>
+                <div class="report-export-grid">
+                  <a class="primary-button deadline-link" href="/api/reports/export/pdf" data-report-export-pdf>Unduh PDF</a>
+                  <a class="secondary-button deadline-link" href="/api/reports/export/csv?datasets=tasks" data-report-export-csv-tasks>CSV Pekerjaan</a>
+                  <a class="secondary-button deadline-link" href="/api/reports/export/csv?datasets=activities" data-report-export-csv-activities>CSV Aktivitas</a>
+                  <a class="secondary-button deadline-link" href="/api/reports/export/csv?datasets=routines" data-report-export-csv-routines>CSV Rutinitas</a>
+                  <a class="secondary-button deadline-link" href="/api/reports/export/csv?datasets=tasks,activities,routines,summary" data-report-export-csv-all>ZIP Semua CSV</a>
+                </div>
               </article>
             </section>
 

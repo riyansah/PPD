@@ -56,6 +56,7 @@ const DASHBOARD_PAGE = "/dashboard";
 const TASK_PAGE = "/tasks";
 const ACTIVITY_PAGE = "/activities";
 const ROUTINE_PAGE = "/routines";
+const REPORTS_PAGE = "/reports";
 const SECURITY_PAGE = "/security";
 
 const state = {
@@ -67,6 +68,12 @@ const state = {
     countdownTimer: null,
     serverTimeBase: null,
     clientTimeBase: null
+  },
+  reports: {
+    summary: null,
+    tasks: [],
+    activities: [],
+    routines: []
   },
   activities: [],
   activityEditingId: null,
@@ -107,6 +114,19 @@ const elements = {
   dashboardPeriod: document.querySelector("[data-dashboard-period]"),
   dashboardSummary: document.querySelector("[data-dashboard-summary]"),
   dashboardToday: document.querySelector("[data-dashboard-today]"),
+  reportExportCsvActivities: document.querySelector("[data-report-export-csv-activities]"),
+  reportExportCsvAll: document.querySelector("[data-report-export-csv-all]"),
+  reportExportCsvRoutines: document.querySelector("[data-report-export-csv-routines]"),
+  reportExportCsvTasks: document.querySelector("[data-report-export-csv-tasks]"),
+  reportExportPdf: document.querySelector("[data-report-export-pdf]"),
+  reportFiltersForm: document.querySelector("[data-report-filters]"),
+  reportMessage: document.querySelector("[data-report-message]"),
+  reportRange: document.querySelector("[data-report-range]"),
+  reportReset: document.querySelector("[data-report-reset]"),
+  reportSummary: document.querySelector("[data-report-summary]"),
+  reportSummaryText: document.querySelector("[data-report-summary-text]"),
+  reportCharts: document.querySelector("[data-report-charts]"),
+  reportTables: document.querySelector("[data-report-tables]"),
   accountDetails: document.querySelector("[data-account-details]"),
   activityDetail: document.querySelector("[data-activity-detail]"),
   activityFiltersForm: document.querySelector("[data-activity-filters]"),
@@ -560,6 +580,209 @@ async function loadDashboard() {
   setMessage(elements.dashboardMessage, "", "");
 }
 
+
+function buildReportQuery() {
+  const params = new URLSearchParams();
+  const formData = new FormData(elements.reportFiltersForm);
+
+  for (const [key, rawValue] of formData.entries()) {
+    const value = String(rawValue).trim();
+    if (value) {
+      params.set(key, value);
+    }
+  }
+
+  if (!params.has("period")) {
+    params.set("period", "weekly");
+  }
+
+  return params;
+}
+
+function updateReportExportLinks() {
+  const query = buildReportQuery();
+  const queryText = query.toString();
+  const withDatasets = (datasets) => {
+    const params = new URLSearchParams(queryText);
+    params.set("datasets", datasets);
+    return params.toString();
+  };
+
+  if (elements.reportExportPdf) {
+    elements.reportExportPdf.href = `/api/reports/export/pdf?${queryText}`;
+  }
+  if (elements.reportExportCsvTasks) {
+    elements.reportExportCsvTasks.href = `/api/reports/export/csv?${withDatasets("tasks")}`;
+  }
+  if (elements.reportExportCsvActivities) {
+    elements.reportExportCsvActivities.href = `/api/reports/export/csv?${withDatasets("activities")}`;
+  }
+  if (elements.reportExportCsvRoutines) {
+    elements.reportExportCsvRoutines.href = `/api/reports/export/csv?${withDatasets("routines")}`;
+  }
+  if (elements.reportExportCsvAll) {
+    elements.reportExportCsvAll.href = `/api/reports/export/csv?${withDatasets("tasks,activities,routines,summary")}`;
+  }
+}
+
+function renderReportSummary() {
+  const summary = state.reports.summary;
+  if (!summary) {
+    elements.reportSummary.innerHTML = '<div class="empty-copy">Ringkasan laporan belum tersedia.</div>';
+    elements.reportSummaryText.innerHTML = "";
+    return;
+  }
+
+  const cards = [
+    ["Pekerjaan", summary.task_summary.total],
+    ["Pekerjaan selesai", summary.task_summary.completed],
+    ["Lewat deadline", summary.task_summary.overdue],
+    ["Penyelesaian pekerjaan", `${summary.task_summary.completion_percentage}%`],
+    ["Aktivitas", summary.activity_summary.total],
+    ["Aktivitas selesai", summary.activity_summary.completed],
+    ["Rutinitas terjadwal", summary.routine_summary.total_scheduled],
+    ["Penyelesaian rutinitas", `${summary.routine_summary.completion_percentage}%`]
+  ];
+
+  elements.reportRange.textContent = `${formatLocalDate(summary.range.start_date)} - ${formatLocalDate(summary.range.end_date)}`;
+  elements.reportSummary.innerHTML = cards.map(([label, value], index) => `
+    <article class="metric-card ${index === 0 ? "metric-accent" : index === 2 ? "metric-alert" : ""}">
+      <span class="metric-label">${escapeHtml(label)}</span>
+      <strong>${escapeHtml(String(value))}</strong>
+    </article>
+  `).join("");
+  elements.reportSummaryText.innerHTML = `
+    <article class="empty-copy report-insight">
+      <strong>Ringkasan otomatis</strong>
+      <p>${escapeHtml(summary.generated_summary_text)}</p>
+      <p class="subtle">Aktivitas tersering: ${escapeHtml(summary.activity_most_frequent.title || "-")} · Kategori: ${escapeHtml(summary.activity_most_frequent.category || "-")}</p>
+    </article>
+  `;
+}
+
+function renderReportCharts() {
+  const summary = state.reports.summary;
+  if (!summary) {
+    elements.reportCharts.innerHTML = "";
+    return;
+  }
+
+  elements.reportCharts.innerHTML = [
+    renderChartBlock("Pekerjaan", summary.charts.tasks_by_status, {
+      in_progress: "Berjalan",
+      completed: "Selesai",
+      paused: "Tertunda",
+      cancelled: "Dibatalkan",
+      overdue: "Lewat deadline"
+    }),
+    renderChartBlock("Aktivitas", summary.charts.activities_by_status, {
+      scheduled: "Terjadwal",
+      completed: "Selesai",
+      cancelled: "Dibatalkan"
+    }),
+    renderChartBlock("Rutinitas", summary.charts.routines_by_status, {
+      completed: "Selesai",
+      missed: "Terlewat",
+      cancelled: "Dibatalkan",
+      pending: "Pending"
+    })
+  ].join("");
+}
+
+function renderReportTable(title, headers, rows, emptyMessage) {
+  if (!rows.length) {
+    return `<article class="report-table-card"><h4>${escapeHtml(title)}</h4><div class="empty-copy">${escapeHtml(emptyMessage)}</div></article>`;
+  }
+
+  return `
+    <article class="report-table-card">
+      <h4>${escapeHtml(title)}</h4>
+      <div class="report-table-wrap">
+        <table class="report-table">
+          <thead><tr>${headers.map((header) => `<th>${escapeHtml(header.label)}</th>`).join("")}</tr></thead>
+          <tbody>
+            ${rows.slice(0, 12).map((row) => `
+              <tr>${headers.map((header) => `<td>${escapeHtml(row[header.key] ?? "-")}</td>`).join("")}</tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </article>
+  `;
+}
+
+function renderReportTables() {
+  elements.reportTables.innerHTML = [
+    renderReportTable("Pekerjaan", [
+      { key: "title", label: "Judul" },
+      { key: "status", label: "Status" },
+      { key: "priority", label: "Prioritas" },
+      { key: "deadline_at", label: "Deadline" }
+    ], state.reports.tasks, "Tidak ada pekerjaan pada periode ini."),
+    renderReportTable("Aktivitas", [
+      { key: "title", label: "Judul" },
+      { key: "category", label: "Kategori" },
+      { key: "activity_date", label: "Tanggal" },
+      { key: "status", label: "Status" }
+    ], state.reports.activities, "Tidak ada aktivitas pada periode ini."),
+    renderReportTable("Rutinitas", [
+      { key: "routine_title_snapshot", label: "Judul" },
+      { key: "scheduled_date", label: "Tanggal" },
+      { key: "scheduled_start", label: "Mulai" },
+      { key: "status", label: "Status" }
+    ], state.reports.routines, "Tidak ada riwayat rutinitas pada periode ini.")
+  ].join("");
+}
+
+function updateReportMetrics() {
+  const summary = state.reports.summary;
+  if (!summary) {
+    setText(elements.statTotal, "0");
+    setText(elements.statSecondary1, "0");
+    setText(elements.statSecondary2, "0");
+    setText(elements.statAlert, "0");
+    setText(elements.statSelected, "0");
+    return;
+  }
+
+  setText(elements.statTotal, String(summary.task_summary.total));
+  setText(elements.statSecondary1, String(summary.task_summary.completed));
+  setText(elements.statSecondary2, String(summary.activity_summary.total + summary.routine_summary.total_scheduled));
+  setText(elements.statAlert, String(summary.task_summary.overdue + summary.routine_summary.missed));
+  setText(elements.statSelected, `${summary.task_summary.completion_percentage}%`);
+}
+
+async function loadReports() {
+  setMessage(elements.reportMessage, "Memuat laporan…", "");
+  updateReportExportLinks();
+  const queryText = buildReportQuery().toString();
+  const [summaryResult, tasksResult, activitiesResult, routinesResult] = await Promise.all([
+    requestJson(`/api/reports/summary?${queryText}`),
+    requestJson(`/api/reports/tasks?${queryText}`),
+    requestJson(`/api/reports/activities?${queryText}`),
+    requestJson(`/api/reports/routines?${queryText}`)
+  ]);
+  const firstPayload = summaryResult.payload || tasksResult.payload || activitiesResult.payload || routinesResult.payload;
+  setServerTime(firstPayload && firstPayload.meta ? firstPayload.meta.server_time : null);
+
+  const failed = [summaryResult, tasksResult, activitiesResult, routinesResult].find((result) => !result.response.ok);
+  if (failed) {
+    setMessage(elements.reportMessage, getErrorMessage(failed.payload, "Gagal memuat laporan."), "error");
+    return;
+  }
+
+  state.reports.summary = summaryResult.payload.data;
+  state.reports.tasks = tasksResult.payload.data.items;
+  state.reports.activities = activitiesResult.payload.data.items;
+  state.reports.routines = routinesResult.payload.data.items;
+  renderReportSummary();
+  renderReportCharts();
+  renderReportTables();
+  updateReportMetrics();
+  updateReportExportLinks();
+  setMessage(elements.reportMessage, "", "");
+}
+
 function formatWeekdays(days) {
   if (!Array.isArray(days) || days.length === 0) {
     return "-";
@@ -579,6 +802,10 @@ function getCurrentPath() {
 
   if (window.location.pathname === ROUTINE_PAGE) {
     return ROUTINE_PAGE;
+  }
+
+  if (window.location.pathname === REPORTS_PAGE) {
+    return REPORTS_PAGE;
   }
 
   if (window.location.pathname === SECURITY_PAGE) {
@@ -608,6 +835,10 @@ function pathForTarget(target) {
 
   if (target === "routines") {
     return ROUTINE_PAGE;
+  }
+
+  if (target === "reports") {
+    return REPORTS_PAGE;
   }
 
   if (target === "security") {
@@ -649,6 +880,25 @@ function setPageCopy() {
     elements.metricCard3Desc.textContent = "Gabungan aktivitas dan rutinitas hari ini.";
     elements.metricCard4Label.textContent = "Lewat deadline";
     elements.metricCard4Desc.textContent = "Pekerjaan aktif yang melewati deadline.";
+    elements.kpiSelectedLabel.textContent = "Penyelesaian";
+    return;
+  }
+
+  if (currentPath === REPORTS_PAGE) {
+    elements.pageEyebrow.textContent = "Productivity Reports";
+    elements.pageTitle.textContent = "Reports";
+    elements.heroEyebrow.textContent = "Period Intelligence";
+    elements.heroDescription.textContent = "Evaluasi pekerjaan, aktivitas, dan rutinitas berdasarkan periode yang sama dengan file ekspor.";
+    elements.metricTotalLabel.textContent = "Total pekerjaan";
+    elements.metricAlertLabel.textContent = "Risiko periode";
+    elements.metricCard1Label.textContent = "Pekerjaan";
+    elements.metricCard1Desc.textContent = "Pekerjaan yang dimulai pada periode laporan.";
+    elements.metricCard2Label.textContent = "Selesai";
+    elements.metricCard2Desc.textContent = "Pekerjaan selesai dalam data periode.";
+    elements.metricCard3Label.textContent = "Kegiatan";
+    elements.metricCard3Desc.textContent = "Aktivitas dan rutinitas pada periode.";
+    elements.metricCard4Label.textContent = "Perlu perhatian";
+    elements.metricCard4Desc.textContent = "Deadline terlewat dan rutinitas terlewat.";
     elements.kpiSelectedLabel.textContent = "Penyelesaian";
     return;
   }
@@ -713,6 +963,11 @@ function updateOverviewMetrics() {
 
   if (currentPath === DASHBOARD_PAGE) {
     updateDashboardMetrics();
+    return;
+  }
+
+  if (currentPath === REPORTS_PAGE) {
+    updateReportMetrics();
     return;
   }
 
@@ -1901,6 +2156,19 @@ function bindEvents() {
   if (elements.dashboardPeriod) {
     elements.dashboardPeriod.addEventListener("change", loadDashboard);
   }
+  if (elements.reportFiltersForm) {
+    elements.reportFiltersForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await loadReports();
+    });
+  }
+  if (elements.reportReset) {
+    elements.reportReset.addEventListener("click", async () => {
+      elements.reportFiltersForm.reset();
+      elements.reportFiltersForm.elements.period.value = "weekly";
+      await loadReports();
+    });
+  }
   elements.taskForm.addEventListener("submit", submitTaskForm);
   elements.taskReset.addEventListener("click", resetTaskForm);
   elements.taskFiltersForm.addEventListener("submit", async (event) => {
@@ -2036,6 +2304,8 @@ async function boot() {
 
     if (getCurrentPath() === DASHBOARD_PAGE) {
       await loadDashboard();
+    } else if (getCurrentPath() === REPORTS_PAGE) {
+      await loadReports();
     } else if (getCurrentPath() === ACTIVITY_PAGE) {
       await loadActivities(1);
     } else if (getCurrentPath() === ROUTINE_PAGE) {

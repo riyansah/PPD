@@ -15,11 +15,13 @@ const { createSessionRepository } = require("./repositories/session-repository")
 const { createLoginRateLimitRepository } = require("./repositories/login-rate-limit-repository");
 const { createTaskRepository } = require("./repositories/task-repository");
 const { createDashboardRepository } = require("./repositories/dashboard-repository");
+const { createReportRepository } = require("./repositories/report-repository");
 const { createActivityRepository } = require("./repositories/activity-repository");
 const { createRoutineRepository } = require("./repositories/routine-repository");
 const { createAuthService } = require("./services/auth-service");
 const { createTaskService } = require("./services/task-service");
 const { createDashboardService } = require("./services/dashboard-service");
+const { createReportService } = require("./services/report-service");
 const { createActivityService } = require("./services/activity-service");
 const { createRoutineService } = require("./services/routine-service");
 const { startRoutineReconciliationJob } = require("./jobs/routine-reconciliation-job");
@@ -32,6 +34,7 @@ function createApp({ env, db, logger, nowProvider, startScheduler = env.nodeEnv 
   const loginRateLimitRepository = createLoginRateLimitRepository(db);
   const taskRepository = createTaskRepository(db);
   const dashboardRepository = createDashboardRepository(db);
+  const reportRepository = createReportRepository(db);
   const activityRepository = createActivityRepository(db);
   const routineRepository = createRoutineRepository(db);
   const authService = createAuthService({
@@ -46,6 +49,7 @@ function createApp({ env, db, logger, nowProvider, startScheduler = env.nodeEnv 
   const activityService = createActivityService({ activityRepository, nowProvider });
   const routineService = createRoutineService({ routineRepository, nowProvider });
   const dashboardService = createDashboardService({ dashboardRepository, routineService, nowProvider });
+  const reportService = createReportService({ reportRepository, routineService, nowProvider });
 
   app.disable("x-powered-by");
   app.use(requestContextMiddleware);
@@ -57,19 +61,20 @@ function createApp({ env, db, logger, nowProvider, startScheduler = env.nodeEnv 
   app.use("/assets", express.static(path.join(frontendRoot, "assets")));
   app.use("/styles", express.static(path.join(frontendRoot, "styles")));
   app.use("/scripts", express.static(path.join(frontendRoot, "scripts")));
-  app.use("/api", createApiRouter({ env, db, authService, dashboardService, taskService, activityService, routineService }));
+  app.use("/api", createApiRouter({ env, db, authService, dashboardService, reportService, taskService, activityService, routineService }));
 
   app.get("/login", redirectAuthenticatedUser, (req, res) => {
     res.sendFile(path.join(frontendRoot, "pages", "login.html"));
   });
 
-  app.get(["/", "/dashboard", "/tasks", "/activities", "/routines", "/security"], requirePageAuth, (req, res) => {
+  app.get(["/", "/dashboard", "/tasks", "/activities", "/routines", "/reports", "/security"], requirePageAuth, (req, res) => {
     res.sendFile(path.join(frontendRoot, "pages", "index.html"));
   });
 
   app.locals.services = {
     authService,
     dashboardService,
+    reportService,
     taskService,
     activityService,
     routineService

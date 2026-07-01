@@ -147,21 +147,21 @@ Acceptance:
 
 ## Fase 7. Laporan dan Ekspor
 
-- [ ] Implementasi `GET /api/reports/summary`.
-- [ ] Implementasi `GET /api/reports/tasks`.
-- [ ] Implementasi `GET /api/reports/activities`.
-- [ ] Implementasi `GET /api/reports/routines`.
-- [ ] Bangun halaman laporan dengan filter periode.
-- [ ] Implementasi statistik pekerjaan, aktivitas, dan rutinitas.
-- [ ] Implementasi ringkasan otomatis berbasis aturan.
-- [ ] Implementasi ekspor PDF.
-- [ ] Implementasi ekspor CSV.
-- [ ] Tambahkan validasi kesesuaian data tampilan vs data ekspor.
+- [x] Implementasi `GET /api/reports/summary`.
+- [x] Implementasi `GET /api/reports/tasks`.
+- [x] Implementasi `GET /api/reports/activities`.
+- [x] Implementasi `GET /api/reports/routines`.
+- [x] Bangun halaman laporan dengan filter periode.
+- [x] Implementasi statistik pekerjaan, aktivitas, dan rutinitas.
+- [x] Implementasi ringkasan otomatis berbasis aturan.
+- [x] Implementasi ekspor PDF.
+- [x] Implementasi ekspor CSV.
+- [x] Tambahkan validasi kesesuaian data tampilan vs data ekspor.
 
 Acceptance:
 
-- [ ] Laporan tampil sesuai periode.
-- [ ] PDF dan CSV dapat diunduh dan sesuai data yang difilter.
+- [x] Laporan tampil sesuai periode.
+- [x] PDF dan CSV dapat diunduh dan sesuai data yang difilter.
 
 ## Fase 8. Pengaturan, Notifikasi, dan Data Safety
 

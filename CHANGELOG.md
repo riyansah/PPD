@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-01
+
+### Added
+- Added authenticated report summary, task, activity, and routine endpoints with daily, weekly, monthly, and custom date filters.
+- Added server-generated PDF exports and UTF-8 CSV exports, including ZIP output for multiple datasets.
+- Added responsive report UI with period filters, statistics, rule-based productivity summary, charts, data tables, and export links.
+- Added automated report tests covering period filtering, export consistency, PDF/CSV/ZIP responses, and validation.
+
 ## [0.7.0] - 2026-07-01
 
 ### Added

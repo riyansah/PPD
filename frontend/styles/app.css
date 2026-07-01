@@ -747,6 +747,66 @@ textarea {
   background: linear-gradient(135deg, #f59e0b, #d14343);
 }
 
+
+.report-summary-text,
+.report-table-stack,
+.report-export-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.report-insight strong,
+.report-insight p {
+  margin: 0;
+}
+
+.report-insight p + p {
+  margin-top: 0.55rem;
+}
+
+.report-table-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.report-table-card h4 {
+  margin: 0;
+}
+
+.report-table-wrap {
+  overflow-x: auto;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+.report-table th,
+.report-table td {
+  padding: 0.8rem 0.9rem;
+  border-bottom: 1px solid rgba(96, 112, 143, 0.14);
+  text-align: left;
+  vertical-align: top;
+}
+
+.report-table th {
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.report-export-grid {
+  grid-template-columns: 1fr;
+}
+
 @media (max-width: 1320px) {
   .metrics-grid,
   .filter-grid,
